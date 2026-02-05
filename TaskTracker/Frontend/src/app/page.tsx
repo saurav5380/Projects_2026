@@ -41,8 +41,8 @@ export default function Home() {
       <h1 className="text-7xl font-extrabold justify-items-start mx-6">TaskTracker</h1>
       <main className="flex w-full items-center py-8 px-16 bg-white dark:bg-black sm:items-start">
         <div className="flex gap-6 ml-auto">
-          <button className="px-4 py-4 border border-zinc-50 mt-6  rounded-lg text-xl hover:cursor-pointer hover:text-[#3b82f6] hover:border-[#3b82f6] transition-all">Login</button>
-          <button className="px-4 py-4 border border-zinc-50 mt-6 rounded-lg text-xl hover:cursor-pointer hover:text-[#3b82f6] hover:border-[#3b82f6] transition-all">Signup</button>
+          <button className="px-4 py-4 border border-zinc-50 mt-6  rounded-lg text-xl hover:cursor-pointer hover:text-[#085feb] hover:border-[#3b82f6] hover:-translate-y-1 transition-all">Login</button>
+          <button className="px-4 py-4 border border-zinc-50 mt-6 rounded-lg text-xl hover:cursor-pointer hover:text-[#085feb] hover:border-[#3b82f6] hover:-translate-y-1 transition-all">Signup</button>
         </div>
       </main>  
     </div>
@@ -51,8 +51,8 @@ export default function Home() {
         <h3 className="p-4 text-center text-2xl font-bold">A simple daily task list app that helps you stay focused and productive</h3>
     </div>
     <div className="flex gap-6 justify-center p-4">
-    <button className="px-4 py-4 border border-zinc-50  rounded-lg text-lg hover:cursor-pointer hover:text-orange-400 hover:border-orange-400 transition-all">Get Started Free</button>
-    <button className="px-4 py-4 border border-zinc-50  rounded-lg text-lg hover:cursor-pointer hover:text-orange-400 hover:border-orange-400 transition-all"> Watch Demo</button>
+    <button className="px-4 py-4 border border-zinc-50  rounded-lg text-lg hover:cursor-pointer hover:text-[#085feb] hover:border-[#3b82f6] transition-all">Get Started Free</button>
+    <button className="px-4 py-4 border border-zinc-50  rounded-lg text-lg hover:cursor-pointer hover:text-[#085feb] hover:border-[#3b82f6] transition-all"> Watch Demo</button>
     </div>
     <div className="flex items-center justify-center">
     <div className="relative w-full max-w-lg h-64 flex items-center justify-center m-4">
@@ -84,7 +84,7 @@ export default function Home() {
       <div className="p-4 mt-6 flex flex-col bg-slate-200 w-full">
       <h2 className="p-4 text-center text-5xl font-extrabold"> Ready to Get Organised </h2>
       <h3 className="p-4 text-center text-2xl font-bold">Join Thousands of users who organise their day using TaskTracker</h3>
-      <button className="p-6 border border-zinc-50 rounded-lg bg-zinc-100 w-72 mx-auto hover:cursor-pointer">Start your Free Trial</button>
+      <button className="p-6 border border-zinc-50 rounded-lg bg-zinc-100 w-72 mx-auto hover:cursor-pointer hover:text-[#085feb] hover:border-[#3b82f6] hover:-translate-y-1 transition-all">Start your Free Trial</button>
       </div>
     </div>
     <div className="flex items-center justify-center m-6">
