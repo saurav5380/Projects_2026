@@ -8,7 +8,7 @@ load_dotenv()
 
 Base = declarative_base()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:root@localhost:5432/locallead_dev")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:root@localhost:5432/tasktracker")
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

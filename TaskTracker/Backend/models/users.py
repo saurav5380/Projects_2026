@@ -1,7 +1,11 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import (String, Integer, DateTime)
 from sqlalchemy.sql import func
 from db import Base
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from task import Task
 
 
 class Users(Base):
@@ -12,3 +16,5 @@ class Users(Base):
     password_hash: Mapped[String] = mapped_column(String, nullable=False)
     full_name: Mapped[String] = mapped_column(String, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
+    tasks: Mapped[List["Task"]] = relationship("Task", back_populates="users")
+

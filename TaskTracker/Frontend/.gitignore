@@ -10,6 +10,7 @@
 !.yarn/releases
 !.yarn/versions
 
+
 # testing
 /coverage
 
@@ -23,6 +24,10 @@
 # misc
 .DS_Store
 *.pem
+*.venv
+/alembic
+
+
 
 # debug
 npm-debug.log*
