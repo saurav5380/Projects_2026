@@ -4,6 +4,8 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session
 from db import get_db
 from schema.userlogin_validation import UserLogin
+from services.create_user_token import create_user_token
+from datetime import timedelta
 
 router = APIRouter()
 
@@ -24,9 +26,12 @@ async def user_login(user_data: UserLogin, db: Session = Depends(get_db)):
                      raise HTTPException(status_code=401, detail="Invalid username or password")
                 if validate_user:
                      # create user token
+                     data = {
+                          "sub": user_data.username
+                     }
+                     user_token = create_user_token(data=data, expires_delta=timedelta(minutes=30))
                      print("User Authenticated")
-                     raise HTTPException(status_code=200, detail=status.HTTP_200_OK)
-                    
+                     return user_token
 
     except Exception as e:
          return {"message": f"login failed due to error: {str(e)}"}
