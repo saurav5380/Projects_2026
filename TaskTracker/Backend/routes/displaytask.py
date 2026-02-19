@@ -9,7 +9,7 @@ from schema.userlogin_validation import UserLogin
 
 router = APIRouter()
 
-@router.get("/tasklist", status_code=status.HTTP_200_OK)
+@router.get("/displaytask", status_code=status.HTTP_200_OK)
 def user_task_list(user_data: UserLogin, db: Session = Depends(get_db)):
     current_user = user_data.username
     try:
