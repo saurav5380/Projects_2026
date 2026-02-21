@@ -21,19 +21,19 @@ async def get_current_user(token:str = Depends(oauth2_scheme), db: Session = Dep
         username = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised token")
-        response = db.execute(text("SELECT username, password, email FROM users WHERE username = :username"), {"username":username})
+        response = db.execute(text("SELECT id, username, email FROM users WHERE username = :username"), {"username":username})
         user_data: Any = response.fetchone()
-        
+
     except ExpiredSignatureError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired. Please login again.")
-    
+
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorised access")
-    
+
     return {
-        "user_id": user_data[0],
-        "email": user_data[1],
-        "username": user_data[2],
+        "id": user_data[0],
+        "username": user_data[1],
+        "email": user_data[2],
     }
 
 
