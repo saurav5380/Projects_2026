@@ -38,13 +38,12 @@ router.post("/registration", registerValidation, handleValidationErrors, async (
         const newUser = await prisma.user.create({
             data: {
                 email,
-                passwordHash,
+                password_hash: passwordHash,
                 name
             },
             select: {
                 id: true,
                 email: true,
-                passwordHash: true,
                 name: true,
                 created_at: true
             }
@@ -56,7 +55,7 @@ router.post("/registration", registerValidation, handleValidationErrors, async (
         });
         
     } catch (error) {
-        console.error('Registration error')
+        console.error('Registration error', error)
         res.status(500).json({
             error: 'Internal server error during registration' 
         });

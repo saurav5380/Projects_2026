@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "prisma:generate": "prisma generate",
+    "postinstall": "prisma generate",
     "dev": "nodemon index.js",
     "start": "node index.js"
   },
@@ -11,16 +13,18 @@
   "license": "ISC",
   "description": "Express backend for Bloggs",
   "dependencies": {
-    "@prisma/client": "^7.4.2",
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "dotenv": "^17.3.1",
     "nodemon": "^3.1.14",
-    "prisma": "^7.4.1"
+    "prisma": "^7.5.0"
   }
 }
