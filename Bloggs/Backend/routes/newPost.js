@@ -15,17 +15,17 @@
 
 const express =  require('express');
 const router = express.Router();
-import validSession from '../middleware/sessionMgmt';
-import slugify from '../utils/slugify';
-import { postValidator } from '../validators/postValidator';
-import { titleValidator } from '../validators/titleValidator';
-import {handleValidatorError} from '../validators/validatorError';
+const validSession =  require('../middleware/sessionMgmt');
+const slugify = require('../utils/slugify');
+const { postValidator } = require('../validators/postValidator');
+const { titleValidator } = require('../validators/titleValidator');
+const { handleValidationErrors } = require('../validators/validatorError');
 const prisma = require('../db');
 
 router.post("/newPost", validSession, 
             titleValidator, 
             postValidator, 
-            handleValidatorError, 
+            handleValidationErrors, 
             async(req, res) => {
               try{
                 const postSlug = await slugify(req.body.title);
@@ -37,7 +37,8 @@ router.post("/newPost", validSession,
                   slug: postSlug,
                   content: req.body.content,
                   meta_description: req.body.meta_description,
-                  status: postStatus
+                  status: ['draft', 'published'].includes(postStatus) ? postStatus : 'draft',
+                  publishedAt: postStatus === 'published' ? new Date() : null
                 }
                 const result = await prisma.posts.create({data: postData});
                 res.status(201).json(result)
