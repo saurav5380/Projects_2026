@@ -20,13 +20,13 @@ router.get("/tags/:tag/posts", getPostWithTags)
 router.post("/posts/newpost", createNewPost)
 
 // Update a Post
-router.put("/posts/:id", updatePost)
+router.patch("/posts/:id", updatePost)
 
 // Delete a Post
 router.delete("/posts/:id", deletePost)
 
 // Upload a image
-router.post("/posts/:id/upload", uploadImageForPost)
+// router.post("/posts/:id/upload", uploadImageForPost)
 
 // Get all published posts ( unauthenticated route)
 router.get("/posts", getAllPosts)
