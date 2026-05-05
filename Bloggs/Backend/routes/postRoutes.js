@@ -2,36 +2,31 @@ const express = require('express');
 const router = express.Router();
 const { getAllPosts, getPostById, getPostBySlug, getMyPosts, createNewPost, updatePost, deletePost, getAllTags, getPostWithTags, uploadImageForPost } = require("../controllers/postController");
 
+// Get all published posts ( unauthenticated route)
+router.get("/", getAllPosts)
 
-// Get all posts (published and draft) created by author 
-router.get("/posts/user/my-posts", getMyPosts)
+// Get all posts (published and draft) created by author
+router.get("/user/my-posts", getMyPosts)
 
-// Get a post based on Id
-router.get("/posts/:id", getPostById)
+// Get a post based on Slug (must be before /:id to avoid conflict)
+router.get("/slug/:slug", getPostBySlug)
 
-// Get a post based on Slug
-router.get("/posts/slug/:slug", getPostBySlug)
+// Get all Tags
+router.get("/tags", getAllTags)
 
-
-// Get Post by Tags ( unauthenticated route )
+// Get Posts by Tag
 router.get("/tags/:tag/posts", getPostWithTags)
 
+// Get a post based on Id
+router.get("/:id", getPostById)
+
 // Create a New Post
-router.post("/posts/newpost", createNewPost)
+router.post("/newpost", createNewPost)
 
 // Update a Post
-router.patch("/posts/:id", updatePost)
+router.patch("/:id", updatePost)
 
 // Delete a Post
-router.delete("/posts/:id", deletePost)
-
-// Upload a image
-// router.post("/posts/:id/upload", uploadImageForPost)
-
-// Get all published posts ( unauthenticated route)
-router.get("/posts", getAllPosts)
-
-// Get all Tags 
-router.get("/tags", getAllTags)
+router.delete("/deletePost/:id", deletePost)
 
 module.exports = router;

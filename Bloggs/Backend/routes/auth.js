@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const prisma = require('../db');
-const router = express.Router();
+const authrouter = express.Router();
 const {
     registerValidation,
     loginValidation,
@@ -18,7 +18,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 //========================================================================
 
 
-router.post("/registration", registerValidation, handleValidationErrors, async (req, res) => {
+authrouter.post("/registration", registerValidation, handleValidationErrors, async (req, res) => {
     try {
         const { email, password, name } = req.body;
         const existingUser = await prisma.user.findUnique({ where: {email: email}})
@@ -66,7 +66,7 @@ router.post("/registration", registerValidation, handleValidationErrors, async (
 // LOGIN ENDPOINT
 //========================================================================
 
-router.post("/login", loginValidation, validationResult, async (req, res) => {
+authrouter.post("/login", loginValidation, validationResult, async (req, res) => {
     try{
         const {email, password} = await req.body;
         const checkUser = await prisma.user.findUnique({where: {email}});
@@ -116,4 +116,4 @@ router.post("/login", loginValidation, validationResult, async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = authrouter;

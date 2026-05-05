@@ -52,7 +52,7 @@ const getPostBySlug = async(req,res) => {
 
 const getMyPosts = async(req,res) => {   
     try{
-        const userId = req.body.id;
+        const userId = parseInt(req.body.id);
         const result = await prisma.posts.findMany({
             where:{
                 author_id: userId 
@@ -176,7 +176,7 @@ const updatePost = async(req,res) => {
 
 const deletePost = async(req,res) => {
     try{
-        const postId = parseInt(req.body.id);
+        const postId = parseInt(req.params.id);
         const result = await prisma.posts.delete({
             where:{
                 id: postId
@@ -202,11 +202,6 @@ const deletePost = async(req,res) => {
         }
     }
 }
-
-// const uploadImageForPost = async(req,res) => {
-
-//     return
-// }
 
 module.exports = {
     getAllPosts,
