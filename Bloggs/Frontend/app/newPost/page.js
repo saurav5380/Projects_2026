@@ -39,6 +39,35 @@ const handleFormSubmit = (e) => {
     e.preventDefault();
 }
 
+const handleDraft = async () => {
+    const response = await fetch('http://localhost:3001/posts/newpost', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${localStorage.getitem('token')}`
+        },
+        body: JSON.stringify({title, 
+            slug, 
+            content, 
+            status: 'DRAFT'})
+    })
+}
+
+const handlePublish = async () => {
+    const response = await fetch('http://localhost:3001/posts/newpost', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            "Authorization": `Bearer ${localStorage.getitem('token')}`
+        },
+        body: JSON.stringify({title, 
+            slug, 
+            content, 
+            status: 'PUBLISHED'})
+    })
+    
+}
+
 const NewPost = () => {
    
     // const { user, login, logout } = useAuth();
@@ -56,6 +85,10 @@ const NewPost = () => {
             <form onSubmit={handleFormSubmit}>
                 <PostEditor />
             </form>
+            <div className='flex justify-center'>
+            <button className='m-4 p-2 border border-gray-500 bg-gray-300 rounded-sm' onClick={handleDraft}>Save Draft</button>
+            <button className='m-4 p-2 border border-gray-500 bg-gray-300 rounded-sm' onClick={handlePublish}>Publish</button>
+            </div>
         </div>
         </div>
         </>
