@@ -4,3 +4,8 @@ html{
     color-scheme: light;
 
 }
+
+.EasyMDEContainer .CodeMirror{
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 15px;
+}
