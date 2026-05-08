@@ -1,5 +1,7 @@
+import slugify from '../utils/slugify';
 const { PrismaClientKnownRequestError, PrismaClientValidationError } = require('@prisma/client/runtime/client');
 const prisma = require('../db');
+
 
 const getAllPosts = async(req, res) => {
     try{
@@ -96,46 +98,79 @@ const getPostWithTags = async(req,res) => {
     
 }
 
-const createNewPost = async(req,res) => {
-    try{
+const createNewPost = async (req, res) => {
+    try {
+        // ---- EXTRACT AND PROCESS DATA ----
+        
+        // Get author from authenticated user 
+        const authorId = req.user.id;  // Set by validSession middleware
+        
+        // Generate slug from title
+        const postSlug = await slugify(req.body.title);
+        
+        // Get and validate status
+        const postStatus = req.body.status;
+        const validStatus = ['draft', 'published'].includes(postStatus) ? postStatus : 'draft';
+        
+        // Set published_at based on status
+        const publishedAt = validStatus === 'published' ? new Date() : null;
+        
+        // ---- BUILD POST DATA ----
+        
         const newPost = {
-            'author_id': req.body.author_id,
-            'title': req.body.title,
-            'slug': req.body.slug,
-            'content' : req.body.content,
-            'meta_description': req.body.meta_description,
-            'cover_image_url': req.body.cover_image_url,
-            'status': req.body.status,
-            'published_at': req.body.published_at
-        }
-
+            author_id: authorId,           // From JWT token
+            title: req.body.title,         // Validated by titleValidator
+            slug: postSlug,                // Generated from title
+            content: req.body.content,     // Validated by postValidator
+            meta_description: req.body.meta_description || null,  
+            cover_image_url: req.body.cover_image_url || null,    
+            status: validStatus,           
+            published_at: publishedAt      
+        };
+        
+        // ---- CREATE POST IN DATABASE ----
+        
         const result = await prisma.posts.create({
             data: newPost
-        })
-       
-        res.status(201).json(result);
-    }
-    catch(error){
-        if (error instanceof PrismaClientKnownRequestError){
+        });
+        
+        // ---- RETURN SUCCESS RESPONSE ----
+        
+        res.status(201).json({
+            message: 'Post created successfully',
+            post: result
+        });
+        
+    } catch (error) {
+        // ---- ERROR HANDLING ----
+        
+        // Prisma-specific errors
+        if (error instanceof PrismaClientKnownRequestError) {
+            // Handle known database errors (unique constraint, foreign key, etc.)
             return res.status(400).json({
+                error: 'Database error',
                 message: error.message,
                 code: error.code,
                 details: error.meta
-            })
+            });
         }
-        else if (error instanceof PrismaClientValidationError){
+        
+        if (error instanceof PrismaClientValidationError) {
+            // Handle validation errors from Prisma
             return res.status(422).json({
+                error: 'Validation error',
                 message: error.message
-            })
+            });
         }
-        else{
-            // generic catch-all for unknown errors
-            return res.status(500).json({
-                message: "Internal Server Error"
-            })
-        }
+        
+        // Generic error (unknown)
+        console.error('Unexpected error in createNewPost:', error);
+        return res.status(500).json({
+            error: 'Internal server error',
+            message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+        });
     }
-}
+};
 
 const updatePost = async(req,res) => {
     try{

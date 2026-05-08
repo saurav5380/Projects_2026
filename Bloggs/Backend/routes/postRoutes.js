@@ -1,5 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const validSession =  require('../middleware/sessionMgmt');
+const slugify = require('../utils/slugify');
+const { postValidator } = require('../validators/postValidator');
+const { titleValidator } = require('../validators/titleValidator');
+const { handleValidationErrors } = require('../validators/validatorError');
 const { getAllPosts, getPostById, getPostBySlug, getMyPosts, createNewPost, updatePost, deletePost, getAllTags, getPostWithTags, uploadImageForPost } = require("../controllers/postController");
 
 // Get all published posts ( unauthenticated route)
@@ -21,7 +26,10 @@ router.get("/tags/:tag/posts", getPostWithTags)
 router.get("/:id", getPostById)
 
 // Create a New Post
-router.post("/newpost", createNewPost)
+router.post("/newpost", validSession, 
+            titleValidator, 
+            postValidator, 
+            handleValidationErrors, createNewPost)
 
 // Update a Post
 router.patch("/:id", updatePost)
