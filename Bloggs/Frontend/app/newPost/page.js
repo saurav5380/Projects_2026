@@ -35,16 +35,21 @@ const PostEditor = () => {
         )
     }
 
-const handleFormSubmit = (e) => {
-    e.preventDefault();
-}
 
-const handleDraft = async () => {
+const NewPost = () => {
+   
+    const { user, login, logout } = useAuth();
+    
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+    }
+
+    const handleDraft = async () => {
     const response = await fetch('http://localhost:3001/posts/newpost', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            "Authorization": `Bearer ${localStorage.getitem('token')}`
+            "Authorization": `Bearer ${localStorage.getitem('token')}` // Fix: Local storage does not store token
         },
         body: JSON.stringify({title, 
             slug, 
@@ -67,18 +72,12 @@ const handlePublish = async () => {
     })
     
 }
-
-const NewPost = () => {
-   
-    // const { user, login, logout } = useAuth();
-    
-    
     return (
         <>
         <div className="min-h-screen items-center justify-center text-center min-w-screen bg-linear-to-r from-slate-500 to-slate-800 ">
         <header className='flex justify-between'>
             <h2 className='inline-block font-extrabold text-3xl  text-gray-300 m-6 p-4'>Bloggs</h2>
-            <h2 className='inline-block font-bold text-3xl text-gray-300 m-6 p-4'>Welcome Saurav</h2>
+            <h2 className='inline-block font-bold text-3xl text-gray-300 m-6 p-4'>Welcome {user?.name}</h2>
         </header>
         <div className='border-2 border-black'></div>
         <div className='min-w-3/4 min-h-5/6 border border-gray-500'>

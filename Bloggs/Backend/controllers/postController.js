@@ -1,4 +1,4 @@
-import slugify from '../utils/slugify';
+const slugify = require ('../utils/slugify');
 const { PrismaClientKnownRequestError, PrismaClientValidationError } = require('@prisma/client/runtime/client');
 const prisma = require('../db');
 
@@ -54,7 +54,7 @@ const getPostBySlug = async(req,res) => {
 
 const getMyPosts = async(req,res) => {   
     try{
-        const userId = parseInt(req.body.id);
+        const userId = parseInt(req.user.id);
         const result = await prisma.posts.findMany({
             where:{
                 author_id: userId 
@@ -64,7 +64,7 @@ const getMyPosts = async(req,res) => {
     
     }
     catch(error){
-        error: error.message
+        res.status(400).json({error: error.message})
     }
 }
 

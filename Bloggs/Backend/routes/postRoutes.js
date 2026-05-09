@@ -11,7 +11,7 @@ const { getAllPosts, getPostById, getPostBySlug, getMyPosts, createNewPost, upda
 router.get("/", getAllPosts)
 
 // Get all posts (published and draft) created by author
-router.get("/user/my-posts", getMyPosts)
+router.get("/user/my-posts", validSession, getMyPosts)
 
 // Get a post based on Slug (must be before /:id to avoid conflict)
 router.get("/slug/:slug", getPostBySlug)
@@ -32,9 +32,9 @@ router.post("/newpost", validSession,
             handleValidationErrors, createNewPost)
 
 // Update a Post
-router.patch("/:id", updatePost)
+router.patch("/:id", validSession, updatePost)
 
 // Delete a Post
-router.delete("/deletePost/:id", deletePost)
+router.delete("/deletePost/:id", validSession, deletePost)
 
 module.exports = router;

@@ -8,7 +8,7 @@ const CurrentUser = ({ children }) => {
     const [user, setUser] = useState(() => {
         if (typeof window !== 'undefined') {
             const stored = localStorage.getItem('user');
-            return stored ? JSON.parse(stored) : null;
+            return stored ? stored : null;
         }
         return null;
     });
