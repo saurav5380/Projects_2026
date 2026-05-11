@@ -39,7 +39,7 @@ export default function Registration() {
             alert("Passwords do not match!")
             return
         }
-        const response = await fetch("http://localhost:3001/registration", {
+        const response = await fetch("http://localhost:3001/auth/registration", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({name, email, password})
@@ -55,7 +55,7 @@ export default function Registration() {
        }
        catch(err){
         console.error("Error occurred: ", err);
-        alert("Network error. Please try again.");
+        // alert("Network error. Please try again.");
        }
     }
 

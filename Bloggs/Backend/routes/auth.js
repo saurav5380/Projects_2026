@@ -11,7 +11,7 @@ const {
 } = require('../middleware/validator');
 const { validationResult } = require('express-validator');
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.SECRET_KEY;
 
 //========================================================================
 // REGISTRATION ENDPOINT
@@ -66,45 +66,45 @@ authrouter.post("/registration", registerValidation, handleValidationErrors, asy
 // LOGIN ENDPOINT
 //========================================================================
 
-authrouter.post("/login", loginValidation, validationResult, async (req, res) => {
+authrouter.post("/login", loginValidation, handleValidationErrors, async (req, res) => {
     try{
-        const {email, password} = await req.body;
+        const {email, password} = req.body;
         const checkUser = await prisma.user.findUnique({where: {email}});
         if (!checkUser){
-            res.status(404).json({
+            return res.status(404).json({
                 message: "User email or password does not match"
             });
         }
 
-        const checkPassword = await bcrypt.compare(password, user.passwordHash);
+        const checkPassword = await bcrypt.compare(password, checkUser.password_hash);
         if (!checkPassword){
-            res.status(401).json({
+            return res.status(401).json({
                 message: "User email or password does not match"
             });
         }
-        
+
         // construct payload for jwt generation
         const userPayload = {
-            sub: user.id,
-            email: user.email,
-            name: user.name
+            sub: checkUser.id,
+            email: checkUser.email,
+            name: checkUser.name
         }
 
-        const userToken = jwt.sign(
+        const token = jwt.sign(
             userPayload,
-            process.env.JWT_SECRET,
+            JWT_SECRET,
             {
                 expiresIn: process.env.JWT_EXPIRES_IN || '24h',
                 algorithm: "HS256"
             });
-        
+
         // success response
         res.status(200).json({
-            userToken,
+            token,
             user: {
-                id: user.id,
-                email: user.email,
-                name: user.name
+                id: checkUser.id,
+                email: checkUser.email,
+                name: checkUser.name
             }
         });
     }

@@ -19,7 +19,6 @@ export default function Login() {
         e.preventDefault();
         if (!email || !password){
             setError("Email or password is missing");
-            return;
         }
         const response = await fetch("http://localhost:3001/auth/login", {
             method: "POST",

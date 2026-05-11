@@ -110,10 +110,10 @@ const createNewPost = async (req, res) => {
         
         // Get and validate status
         const postStatus = req.body.status;
-        const validStatus = ['draft', 'published'].includes(postStatus) ? postStatus : 'draft';
-        
+        const validStatus = ['DRAFT', 'PUBLISHED'].includes(postStatus) ? postStatus : 'DRAFT';
+
         // Set published_at based on status
-        const publishedAt = validStatus === 'published' ? new Date() : null;
+        const publishedAt = validStatus === 'PUBLISHED' ? new Date() : null;
         
         // ---- BUILD POST DATA ----
         

@@ -1,17 +1,23 @@
 'use client'
 
-import React, { useState, useContext } from "react"
+import React, { useState, useContext, useEffect } from "react"
 
 const userContext = React.createContext(null);
 
 const CurrentUser = ({ children }) => {
-    const [user, setUser] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const stored = localStorage.getItem('user');
-            return stored ? stored : null;
+    const [user, setUser] = useState(null);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        const stored = localStorage.getItem('user');
+        if (stored) {
+            try {
+                setUser(JSON.parse(stored));
+            } catch {
+                localStorage.removeItem('user');
+            }
         }
-        return null;
-    });
+    }, []);
 
     const login = (userData, token) => {
         setUser(userData);

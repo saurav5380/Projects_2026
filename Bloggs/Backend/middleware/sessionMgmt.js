@@ -1,6 +1,5 @@
-const express = require("express");
 const jsonwebtoken = require('jsonwebtoken');
-let decoded;
+
 const validSession = (req,res,next) => {
     try{
         if (!req.headers.authorization){
@@ -14,14 +13,12 @@ const validSession = (req,res,next) => {
             });
         }
     const token = req.headers.authorization.split(" ")[1];
-    if (token){
-        decoded = jsonwebtoken.verify(token, process.env.SECRET_KEY);
-    }
-    else{
-        res.status(401).json({
+    if (!token){
+        return res.status(401).json({
             error: "JWT token missing"
         })
     }
+    const decoded = jsonwebtoken.verify(token, process.env.SECRET_KEY);
     req.user = {
         id: decoded.sub,
         email: decoded.email,
