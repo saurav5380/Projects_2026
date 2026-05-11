@@ -32,7 +32,7 @@ router.post("/newpost", validSession,
             handleValidationErrors, createNewPost)
 
 // Update a Post
-router.patch("/:id", validSession, updatePost)
+router.patch("/updatePost/:id", validSession, updatePost)
 
 // Delete a Post
 router.delete("/deletePost/:id", validSession, deletePost)
