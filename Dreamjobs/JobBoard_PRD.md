@@ -133,7 +133,7 @@ The platform administrator (seeded directly in the database).
 - `user_id` — foreign key → users
 - `company_name` — string
 - `logo_url` — string (path to uploaded file)
-- `website` — string (optional)
+- `website` — string (optional) 
 - `description` — text (optional)
 
 ### `candidates`

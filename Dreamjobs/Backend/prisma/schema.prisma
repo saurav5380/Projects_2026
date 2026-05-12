@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  company
+  candidate
+  admin
+}
+
+enum Job_type {
+  full_time
+  part_time
+  remote
+}
+
+enum Job_status{
+  pending
+  active
+  closed
+  rejected
+}
+
+enum Application_status{
+  applied
+  reviewed
+  shortlisted
+  rejected
+  accepted
+}
+
+model User {
+id Int @id @default(autoincrement())
+name String
+email String @unique
+password_hash String
+role Role
+is_active Boolean @default(true)
+created_at DateTime @default(now())
+companies Companies[]
+candidates Candidates[]
+}
+
+model Companies {
+  id Int @id @default(autoincrement())
+  user User @relation(fields:[user_id], references:[id], onDelete:Cascade)
+  user_id Int
+  company_name String
+  logo_url String 
+  website String?
+  description  String?
+  job_listings Job_Listings[]
+}
+
+model Candidates {
+  id Int @id @default(autoincrement())
+  user User @relation(fields:[user_id], references:[id], onDelete:Cascade)
+  user_id Int
+  headline String
+  resume_url String
+  applications Applications[]
+}
+
+
+
+model Job_Listings {
+ id Int @id @default(autoincrement())
+ company Companies @relation(fields:[company_id], references:[id], onDelete:Cascade)
+ company_id Int
+ title String
+ slug String @unique
+ description String 
+ category String
+ location String
+ job_type Job_type
+ job_status Job_status
+ created_at DateTime @default(now())
+ applications Applications[]
+}
+
+model Applications {
+  id Int @id @default(autoincrement())
+  job Job_Listings @relation(fields:[job_id], references:[id], onDelete:Cascade)
+  job_id Int
+  candidate Candidates @relation(fields:[candidate_id], references:[id], onDelete:Cascade)
+  candidate_id Int
+  cover_note String?
+  resume_url String
+  status Application_status
+  applied_at DateTime @default(now())
+}
+
+
+
