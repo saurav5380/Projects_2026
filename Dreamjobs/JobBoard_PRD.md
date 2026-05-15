@@ -215,11 +215,13 @@ The platform administrator (seeded directly in the database).
 
 ---
 
-### Day 2 — May 15 | Authentication & Role-Based Access
+### Day 2 — May 15 | Authentication & Role-Based Access - Backend routes and middleware
 
 - [✅] Build `POST /api/auth/register` for Company and Candidate roles
 - [✅] Build `POST /api/auth/login` — validate credentials and return a JWT with a role claim
-- [ ] Write reusable auth middleware: `verifyToken` and `requireRole(role)`
+- [✅] Write reusable auth middleware: `verifyToken` and `requireRole(role)`
+
+### Day 3 — May 16 | Authentication & Role-Based Access - Frontend Pages 
 - [ ] Build the Register page in Next.js with a role selection radio button
 - [ ] Build the Login page in Next.js — store JWT in an httpOnly cookie
 - [ ] Implement a protected route HOC (Higher Order Component) in Next.js that redirects unauthenticated users
@@ -227,7 +229,7 @@ The platform administrator (seeded directly in the database).
 
 ---
 
-### Day 3 — May 16 | Job Listings CRUD + Rich Text + Slugs
+### Day 4 — May 18 | Job Listings CRUD + Rich Text + Slugs
 
 - [ ] Build `POST /api/jobs` with auto slug generation using the `slugify` library
 - [ ] Build `GET /api/jobs` with filter query params (category, location, job_type, page) and `GET /api/jobs/:slug`
@@ -239,7 +241,7 @@ The platform administrator (seeded directly in the database).
 
 ---
 
-### Day 4 — May 17 | File Uploads + Search & Filters
+### Day 5 — May 19 | File Uploads + Search & Filters
 
 - [ ] Set up Multer middleware for two upload types: logo (images) and resume (PDF only, max 2 MB)
 - [ ] Build the Company Profile page with logo upload — `PATCH /api/companies/profile`
@@ -251,7 +253,10 @@ The platform administrator (seeded directly in the database).
 
 ---
 
-### Day 5 — May 18 | Application Tracking + Email Notifications + Polish
+### May 17 - Gap day due to travel to Pune.
+
+
+### Day 6 — May 20 | Application Tracking + Email Notifications + Polish
 
 - [ ] Build `GET /api/jobs/:id/applicants` for the Company to view applicants
 - [ ] Build `PATCH /api/applications/:id/status` with status transition validation
