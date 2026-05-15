@@ -203,31 +203,31 @@ The platform administrator (seeded directly in the database).
 
 ---
 
-### Day 1 — May 13 | Project Setup & Database
+### Day 1 — May 14 | Project Setup & Database
 
-- [ ] Initialise monorepo: `/frontend` (Next.js) and `/backend` (Express)
-- [ ] Configure Tailwind CSS in the frontend
-- [ ] Set up PostgreSQL database and `.env` config — DB name: `jobboard_db`
-- [ ] Write and run migration scripts for all 5 tables
+- [✅] Initialise monorepo: `/frontend` (Next.js) and `/backend` (Express)
+- [✅] Configure Tailwind CSS in the frontend
+- [✅] Set up PostgreSQL database and `.env` config — DB name: `jobboard_db`
+- [✅] Write and run migration scripts for all 5 tables
 - [ ] Seed the admin user directly via migration script (use bcrypt for password)
-- [ ] Set up Express folder structure: `routes/`, `controllers/`, `middleware/`
-- [ ] Test DB connection with a `GET /api/health` smoke test endpoint
+- [✅] Set up Express folder structure: `routes/`, `controllers/`, `middleware/`
+- [✅] Test DB connection with a `GET /api/health` smoke test endpoint
 
 ---
 
-### Day 2 — May 14 | Authentication & Role-Based Access
+### Day 2 — May 15 | Authentication & Role-Based Access
 
-- [ ] Build `POST /api/auth/register` for Company and Candidate roles
-- [ ] Build `POST /api/auth/login` — validate credentials and return a JWT with a role claim
+- [✅] Build `POST /api/auth/register` for Company and Candidate roles
+- [✅] Build `POST /api/auth/login` — validate credentials and return a JWT with a role claim
 - [ ] Write reusable auth middleware: `verifyToken` and `requireRole(role)`
 - [ ] Build the Register page in Next.js with a role selection radio button
 - [ ] Build the Login page in Next.js — store JWT in an httpOnly cookie
-- [ ] Implement a protected route HOC in Next.js that redirects unauthenticated users
+- [ ] Implement a protected route HOC (Higher Order Component) in Next.js that redirects unauthenticated users
 - [ ] Test all auth flows manually: register, login, and access a protected page
 
 ---
 
-### Day 3 — May 15 | Job Listings CRUD + Rich Text + Slugs
+### Day 3 — May 16 | Job Listings CRUD + Rich Text + Slugs
 
 - [ ] Build `POST /api/jobs` with auto slug generation using the `slugify` library
 - [ ] Build `GET /api/jobs` with filter query params (category, location, job_type, page) and `GET /api/jobs/:slug`
@@ -239,7 +239,7 @@ The platform administrator (seeded directly in the database).
 
 ---
 
-### Day 4 — May 16 | File Uploads + Search & Filters
+### Day 4 — May 17 | File Uploads + Search & Filters
 
 - [ ] Set up Multer middleware for two upload types: logo (images) and resume (PDF only, max 2 MB)
 - [ ] Build the Company Profile page with logo upload — `PATCH /api/companies/profile`
@@ -251,7 +251,7 @@ The platform administrator (seeded directly in the database).
 
 ---
 
-### Day 5 — May 17 | Application Tracking + Email Notifications + Polish
+### Day 5 — May 18 | Application Tracking + Email Notifications + Polish
 
 - [ ] Build `GET /api/jobs/:id/applicants` for the Company to view applicants
 - [ ] Build `PATCH /api/applications/:id/status` with status transition validation
@@ -295,7 +295,7 @@ These are mapped directly from the Learning Methodology document and are the mos
 
 ## 8. Success Criteria
 
-By **May 17**, you should be able to answer **YES** to all of the following:
+By **May 18**, you should be able to answer **YES** to all of the following:
 
 - [ ] Can a company register, post a job with rich text, and see it go live after admin approval?
 - [ ] Can a candidate browse, filter, search, and apply to a listing by uploading a resume?
@@ -307,5 +307,5 @@ By **May 17**, you should be able to answer **YES** to all of the following:
 **If you can demo all six points above, you have successfully delivered a production-grade learning project.**
 
 ---
-
+✅
 *Happy building! 🚀*
