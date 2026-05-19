@@ -8,7 +8,7 @@ const validSession = (req, res, next) => {
         })
     }
 
-    if (!req.headers.authorization.startsWith('Bearer')){
+    if (!req.headers.authorization.startsWith('Bearer ')){
         return res.status(401).json({
             message: "Invalid authorization format. Expected 'Bearer <token>'"
         })
