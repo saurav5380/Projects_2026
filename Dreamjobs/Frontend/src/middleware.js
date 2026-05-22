@@ -22,7 +22,7 @@ const middleware = async (request) => {
     }
 
     else if (request.nextUrl.pathname.startsWith("/company") && role !== "company"){
-        return NextResponse.error("Forbidden!")
+        return new NextResponse("Forbidden!", {status: 403});
     }
 
     else if (request.nextUrl.pathname.startsWith("/candidate") && role !== "candidate"){

@@ -1,0 +1,80 @@
+const validSession = require("../middleware/sessionMgmt");
+const requireRole = require("../middleware/requireRole"); 
+const express = require('express');
+const slugify = require('slugify');
+const prisma = require("../db");
+const { PrismaClientKnownRequestError, PrismaClientValidationError } = require("../generated/prisma");
+
+const newjobs = express.Router();
+
+newjobs.post("/jobs", validSession, requireRole('company'), async (req, res) => {
+            try{
+                const jobData = {
+                    title: req.body.title,
+                    description: req.body.description,
+                    category: req.body.category,
+                    slug: slugify(req.body.title, {
+                        lower: true,
+                        trim: true,
+                        remove: /[^a-zA-Z0-9\s]/g
+                    }),
+                    location: req.body.location,
+                    job_type: req.body.job_type,
+                    job_status: ["pending", "active", "closed", "rejected"].includes(req.body.job_status) ? req.body.job_status : "pending"
+                }
+                const company = await prisma.companies.findUnique({where: {user_id: req.user.sub}});
+                const response = await prisma.job_Listings.create({
+                    data: jobData,
+                    company_id: company.id
+                })
+                res.status(201).json({
+                    message: "New job posting created"
+                })
+            }
+            catch(error){
+                if (error instanceof PrismaClientKnownRequestError){
+                    return res.status(400).json({
+                        error: "Database error",
+                        message: error.message,
+                        code: error.code,
+                        details: error.meta
+                    })
+                }
+                else if (error instanceof PrismaClientValidationError){
+                    res.status(422).json({
+                        error: "Validation error",
+                        message: error.message,
+                        code: error.code,
+                        details: error.meta
+                    })
+                }
+
+                else{
+                    res.status(500).json({
+                        error: "Internal Server Error",
+                        message: error.message,
+                        code: error.code,
+                        details: error.meta
+                    })
+                }
+
+            }
+            })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports = newjobs;

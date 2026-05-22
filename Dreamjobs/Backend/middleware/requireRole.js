@@ -12,3 +12,5 @@ const requireRole = (userRole) => {
         next();
     }
 } 
+
+module.exports = requireRole;
