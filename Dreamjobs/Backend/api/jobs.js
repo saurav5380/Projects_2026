@@ -5,9 +5,9 @@ const slugify = require('slugify');
 const prisma = require("../db");
 const { PrismaClientKnownRequestError, PrismaClientValidationError } = require("../generated/prisma");
 
-const newjobs = express.Router();
+const jobsRouter = express.Router();
 
-newjobs.post("/jobs", validSession, requireRole('company'), async (req, res) => {
+jobsRouter.post("/jobs", validSession, requireRole('company'), async (req, res) => {
             try{
                 const jobData = {
                     title: req.body.title,
@@ -62,6 +62,47 @@ newjobs.post("/jobs", validSession, requireRole('company'), async (req, res) => 
             })
 
 
+jobsRouter.get("/jobs", validSession, requireRole('candidate'), async(req,res) => {
+    try{
+        
+        const queryData = {
+            ...(req.query.category && {'category': req.query.category}),
+            ...(req.query.location && {'location': req.query.location}),
+            ...(req.query.job_type && {'job_type': req.query.job_type}),
+            ...(req.query.page && {'page': req.query.page})
+        }
+        const response = await prisma.job_Listings.findMany({where: queryData});
+        res.status(200).json(response)
+    }
+    catch(error){
+        if (error instanceof PrismaClientKnownRequestError){
+            res.status(400).json({
+                error: "Database Error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+        else if (error instanceof PrismaClientValidationError){
+            res.status(400).json({
+                error: "Validation Error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+
+        else{
+            res.status(500).json({
+                error: "Internal Server Error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+
+    }
+})
 
 
 
@@ -76,5 +117,4 @@ newjobs.post("/jobs", validSession, requireRole('company'), async (req, res) => 
 
 
 
-
-module.exports = newjobs;
+module.exports = jobsRouter;
