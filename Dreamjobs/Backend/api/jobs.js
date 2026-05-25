@@ -7,6 +7,8 @@ const { PrismaClientKnownRequestError, PrismaClientValidationError } = require("
 
 const jobsRouter = express.Router();
 
+//=============================================== create new jobs =======================================================================//
+
 jobsRouter.post("/jobs", validSession, requireRole('company'), async (req, res) => {
             try{
                 const jobData = {
@@ -20,12 +22,12 @@ jobsRouter.post("/jobs", validSession, requireRole('company'), async (req, res) 
                     }),
                     location: req.body.location,
                     job_type: req.body.job_type,
-                    job_status: ["pending", "active", "closed", "rejected"].includes(req.body.job_status) ? req.body.job_status : "pending"
+                    job_status: ["pending", "rejected"].includes(req.body.job_status) ? req.body.job_status : "pending"
                 }
                 const company = await prisma.companies.findUnique({where: {user_id: req.user.sub}});
+                if (!company){return res.status(404).json({message: "Company Profile not found"})};
                 const response = await prisma.job_Listings.create({
-                    data: jobData,
-                    company_id: company.id
+                    data: {...jobData,company_id: company.id}
                 })
                 res.status(201).json({
                     message: "New job posting created"
@@ -62,16 +64,23 @@ jobsRouter.post("/jobs", validSession, requireRole('company'), async (req, res) 
             })
 
 
-jobsRouter.get("/jobs", validSession, requireRole('candidate'), async(req,res) => {
+
+//=============================================== get jobs based on filter criteria =======================================================================//
+
+jobsRouter.get("/jobs", async(req,res) => {
     try{
-        
-        const queryData = {
-            ...(req.query.category && {'category': req.query.category}),
-            ...(req.query.location && {'location': req.query.location}),
-            ...(req.query.job_type && {'job_type': req.query.job_type}),
-            ...(req.query.page && {'page': req.query.page})
-        }
-        const response = await prisma.job_Listings.findMany({where: queryData});
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const response = await prisma.job_Listings.findMany({
+            where:{
+                job_status: "active",
+                ...(req.query.category && {'category': req.query.category}),
+                ...(req.query.location && {'location': req.query.location}),
+                ...(req.query.job_type && {'job_type': req.query.job_type}), 
+        },
+        skip: (page - 1) * limit,
+        take: limit
+        });
         res.status(200).json(response)
     }
     catch(error){
@@ -104,14 +113,137 @@ jobsRouter.get("/jobs", validSession, requireRole('candidate'), async(req,res) =
     }
 })
 
+//=============================================== get jobs based on slug =======================================================================//
+
+jobsRouter.get("/jobs/:slug", async(req, res) =>{
+    try{
+    const slug = req.params.slug;
+    const response = await prisma.job_Listings.findUnique({where:{slug: slug}});
+    if (!response){
+        return res.status(404).json({message: "Job not found"});
+    }
+    res.status(200).json(response);
+    }
+    catch(error){
+        if (error instanceof PrismaClientKnownRequestError){
+            res.status(400).json({
+                error: "Error finding job",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+        else if (error instanceof PrismaClientValidationError){
+            res.status(400).json({
+                error: 'Validation Error',
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+
+        else{
+            res.status(500).json({
+                error: "Inernal server error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+    }
+})
+
+//=============================================== update jobs based on job id =======================================================================//
+
+jobsRouter.put("/jobs/:id", validSession, requireRole('company'), async(req, res) => {
+    try{
+        const jobId = parseInt(req.params.id);
+        const jobData = {
+            ...(req.body.title && {title: req.body.title}),
+            ...(req.body.description && {description: req.body.description}),
+            ...(req.body.category && {category: req.body.category}),
+            ...(req.body.location && {location: req.body.location}),
+            ...(req.body.job_type && {job_type: req.body.job_type}),
+        }
+        const response = await prisma.job_Listings.findUnique({where: {id: jobId}});
+        if (!response){
+            return res.status(404).json({message: "Job not found"});
+        }
+        const updateJob = await prisma.job_Listings.update({where:{id: jobId}, data:{jobData}});
+        res.status(201).json({
+            message: "Job updated",
+            data: updateJob
+        })
+    }
+    catch(error){
+        if (error instanceof PrismaClientKnownRequestError){
+            res.status(400).json({
+                error: "Job could not be found",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+        else if (error instanceof PrismaClientValidationError){
+            res.status(400).json({
+                error: "Validation Error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+        else{ 
+            res.status(500).json({
+                error: "Internal server error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+    }
+})
 
 
+//=============================================== delete jobs based on job id =======================================================================//
 
-
-
-
-
-
+jobsRouter.delete("/jobs/:id", validSession, requireRole('company'), async(req, res) => {
+    try{
+    const jobId = parseInt(req.params.id);
+    const response = await prisma.job_Listings.findUnique({where: {id: jobId}});
+    if (!response){
+        return res.status(404).json({message: "Job Id not found"})
+    }
+    const deleteJob = await prisma.job_Listings.delete({where:{id: jobId}});
+    req.json({message: "Job Deleted successfully", deleteJob});
+    }
+    
+    catch(error){
+        if (error instanceof PrismaClientKnownRequestError){
+            res.status(400).json({
+                error: "Could not delete job",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+        else if(error instanceof PrismaClientValidationError){
+            res.status(400).json({
+                error: "Client Validation Error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+        else{
+            res.status(500).json({
+                error: "Unknown server error",
+                message: error.message,
+                code: error.code,
+                meta: error.meta
+            })
+        }
+    }
+})
 
 
 
