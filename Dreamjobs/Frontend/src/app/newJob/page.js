@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 const Newjob = () => {
     const [title, setTitle] = useState("");
@@ -21,7 +22,7 @@ const Newjob = () => {
 
         setIsSubmitting(true);
         try {
-            const response = await fetch("/api/jobs", {
+            const response = await fetch(`${API_BASE_URL}/api/jobs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ title, description, category, location, job_type: jobType })

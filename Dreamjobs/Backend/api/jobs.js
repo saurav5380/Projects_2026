@@ -3,7 +3,7 @@ const requireRole = require("../middleware/requireRole");
 const express = require('express');
 const slugify = require('slugify');
 const prisma = require("../db");
-const { PrismaClientKnownRequestError, PrismaClientValidationError } = require("../generated/prisma");
+const { Prisma } = require("@prisma/client");
 
 const jobsRouter = express.Router();
 
@@ -34,7 +34,7 @@ jobsRouter.post("/jobs", validSession, requireRole('company'), async (req, res) 
         })
     }
     catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
             return res.status(400).json({
                 error: "Database error",
                 message: error.message,
@@ -42,7 +42,7 @@ jobsRouter.post("/jobs", validSession, requireRole('company'), async (req, res) 
                 details: error.meta
             })
         }
-        else if (error instanceof PrismaClientValidationError) {
+        else if (error instanceof Prisma.PrismaClientValidationError) {
             res.status(422).json({
                 error: "Validation error",
                 message: error.message,
@@ -84,7 +84,7 @@ jobsRouter.get("/jobs", async (req, res) => {
         res.status(200).json(response)
     }
     catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
             res.status(400).json({
                 error: "Database Error",
                 message: error.message,
@@ -92,7 +92,7 @@ jobsRouter.get("/jobs", async (req, res) => {
                 meta: error.meta
             })
         }
-        else if (error instanceof PrismaClientValidationError) {
+        else if (error instanceof Prisma.PrismaClientValidationError) {
             res.status(400).json({
                 error: "Validation Error",
                 message: error.message,
@@ -125,7 +125,7 @@ jobsRouter.get("/jobs/:slug", async (req, res) => {
         res.status(200).json(response);
     }
     catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
             res.status(400).json({
                 error: "Error finding job",
                 message: error.message,
@@ -133,7 +133,7 @@ jobsRouter.get("/jobs/:slug", async (req, res) => {
                 meta: error.meta
             })
         }
-        else if (error instanceof PrismaClientValidationError) {
+        else if (error instanceof Prisma.PrismaClientValidationError) {
             res.status(400).json({
                 error: 'Validation Error',
                 message: error.message,
@@ -188,7 +188,7 @@ jobsRouter.put("/jobs/:id", validSession, requireRole('company'), async (req, re
         })
     }
     catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
             res.status(400).json({
                 error: "Job could not be found",
                 message: error.message,
@@ -196,7 +196,7 @@ jobsRouter.put("/jobs/:id", validSession, requireRole('company'), async (req, re
                 meta: error.meta
             })
         }
-        else if (error instanceof PrismaClientValidationError) {
+        else if (error instanceof Prisma.PrismaClientValidationError) {
             res.status(400).json({
                 error: "Validation Error",
                 message: error.message,
@@ -239,7 +239,7 @@ jobsRouter.delete("/jobs/:id", validSession, requireRole('company'), async (req,
     }
 
     catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
             res.status(400).json({
                 error: "Could not delete job",
                 message: error.message,
@@ -247,7 +247,7 @@ jobsRouter.delete("/jobs/:id", validSession, requireRole('company'), async (req,
                 meta: error.meta
             })
         }
-        else if (error instanceof PrismaClientValidationError) {
+        else if (error instanceof Prisma.PrismaClientValidationError) {
             res.status(400).json({
                 error: "Client Validation Error",
                 message: error.message,

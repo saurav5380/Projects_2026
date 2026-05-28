@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { query } from "../config/db.js";
+const { Router } = require("express");
+const { query } = require("../config/db");
 
 const router = Router();
 
@@ -16,4 +16,4 @@ router.get("/", async (_req, res, next) => {
   }
 });
 
-export default router;
+module.exports = router;

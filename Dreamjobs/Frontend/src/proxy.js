@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 
-const middleware = async (request) => {
+export const proxy = async (request) => {
     const token = request.cookies.get('token')?.value;
     let role;
     if (!token){

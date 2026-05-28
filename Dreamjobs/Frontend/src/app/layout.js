@@ -2,10 +2,11 @@ import "./globals.css";
 
 export const metadata = {
   title: "Dreamjobs",
-  description: "Dreamjobs frontend",
+  description: "Dreamjobs",
 };
 
 export default function RootLayout({ children }) {
+  
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">{children}</body>
