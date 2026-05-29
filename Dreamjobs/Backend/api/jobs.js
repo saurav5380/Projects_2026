@@ -82,6 +82,14 @@ jobsRouter.get("/jobs", async (req, res) => {
             take: limit
         });
         res.status(200).json(response)
+
+        const totalRecords = await prisma.job_Listings.count({
+            where: {
+                job_status: "active",
+                ...(req.query.category && { 'category': req.query.category }),
+                ...(req.query.location && { 'location': req.query.location }),
+                ...(req.query.job_type && { 'job_type': req.query.job_type }),
+            } })
     }
     catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
