@@ -10,8 +10,11 @@ const Browsejobs = () => {
     const [location, setLocation] = useState("");
     const [jobType, setJobType] = useState("");
     const [jobs, setJobs] = useState([]);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState("");
+    // const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [pagination, setPagination] = useState({totalPages: 1, hasNextPage: false, hasPreviousPage: false })
+
 
     const words = ["Full-time", "Hybrid", "Remote"];
     const [index, setIndex] = useState(0);
@@ -31,14 +34,19 @@ const Browsejobs = () => {
     useEffect(() => {
         const fetchData = async() => {
             try{
-            const response = await fetch(`${API_BASE_URL}/api/jobs`)
-            const totalRecords = await fetch(`${API_BASE_URL}/api/jobs`)
+            const response = await fetch(`${API_BASE_URL}/api/jobs?page=${page}`)
             if (!response.ok){
                 throw new Error ("failed to fetch data")
             }
-            const data = await response.json();
-            setJobs(data);
-            console.log(data);
+            const result = await response.json();
+            setJobs(result.data);
+            setPagination({
+                totalPages: result.totalPages,
+                hasNextPage: result.hasNextPage,
+                hasPreviousPage: result.hasPreviousPage
+            });
+            setPage(result.currentPage);
+            console.log(result.data);
             }
             catch(error){
                 setError(error.message);
@@ -48,7 +56,7 @@ const Browsejobs = () => {
             }
         }
         fetchData();
-    },[])
+    },[page])
 
     const handleJobCategory = (e) =>{
         setCategory(e.target.value)
@@ -60,6 +68,16 @@ const Browsejobs = () => {
 
     const handleJobType = (e) =>{
         setJobType(e.target.value)
+    }
+
+    const handleMoveToNextPage = () =>{
+        if (!pagination.hasNextPage) return alert("You have reached the end")
+        setPage(prev => prev+1)
+    }
+
+    const handleMoveToPreviousPage = () =>{
+        if (!pagination.hasPreviousPage) return alert("this is the first page")
+        setPage(prev => prev-1)
     }
 
     return (
@@ -152,8 +170,10 @@ const Browsejobs = () => {
                 })()}
         </div>
         <div className='flex justify-center items-center mt-4 gap-4'>
-            <button className='border border-[#896ae8] rounded-md p-2 hover:cursor-pointer hover:border-[#4212d4]'>Previous</button>
-            <button className='border border-[#896ae8] rounded-md p-2 hover:cursor-pointer hover:border-[#4212d4]'>Next</button>
+            <button className='border border-[#896ae8] rounded-md p-2 hover:cursor-pointer hover:border-[#4212d4]'
+            onClick={handleMoveToPreviousPage}>Previous</button>
+            <button className='border border-[#896ae8] rounded-md p-2 hover:cursor-pointer hover:border-[#4212d4]' 
+            onClick={handleMoveToNextPage}>Next</button>
         </div>
         <footer>
             <div className='border border-[#896ae8] w-full mt-2'></div>

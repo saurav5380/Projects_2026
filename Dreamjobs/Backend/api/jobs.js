@@ -71,7 +71,7 @@ jobsRouter.get("/jobs", async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = 10;
-        const response = await prisma.job_Listings.findMany({
+        const jobs = await prisma.job_Listings.findMany({
             where: {
                 job_status: "active",
                 ...(req.query.category && { 'category': req.query.category }),
@@ -81,7 +81,6 @@ jobsRouter.get("/jobs", async (req, res) => {
             skip: (page - 1) * limit,
             take: limit
         });
-        res.status(200).json(response)
 
         const totalRecords = await prisma.job_Listings.count({
             where: {
@@ -90,6 +89,17 @@ jobsRouter.get("/jobs", async (req, res) => {
                 ...(req.query.location && { 'location': req.query.location }),
                 ...(req.query.job_type && { 'job_type': req.query.job_type }),
             } })
+        
+        const totalPages = Math.ceil(totalRecords/limit);
+
+        res.status(200).json({
+            data: jobs,
+            totaljobs: totalRecords,
+            totalPages: totalPages,
+            currentPage: page,
+            hasNextPage: page < totalPages,
+            hasPreviousPage: page > 1 
+        })
     }
     catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError) {
