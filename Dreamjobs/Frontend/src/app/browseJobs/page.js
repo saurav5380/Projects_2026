@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -10,11 +11,10 @@ const Browsejobs = () => {
     const [location, setLocation] = useState("");
     const [jobType, setJobType] = useState("");
     const [jobs, setJobs] = useState([]);
-    // const [error, setError] = useState("");
-    // const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [loading,setLoading] = useState(true);
+    const [error,setError] = useState(null);
     const [pagination, setPagination] = useState({totalPages: 1, hasNextPage: false, hasPreviousPage: false })
-
 
     const words = ["Full-time", "Hybrid", "Remote"];
     const [index, setIndex] = useState(0);
@@ -158,13 +158,13 @@ const Browsejobs = () => {
                         ? <p className='text-gray-400 p-8'>No jobs found for the selected filters.</p>
                         : filtered.map(job => (
                             <ul key={job.id}>
-                                <li className='flex flex-col items-start border border-gray-600 p-4 rounded-lg m-4 w-2xl'>
+                               <Link href={`/jobDetail/${job.slug}`}> <li className='flex flex-col items-start border border-gray-600 p-4 rounded-lg m-4 w-2xl'>
                                     <span className='font-bold text-xl'>{job.title}</span>
                                     <span>{job.description}</span>
                                     <span>Category: {job.category}</span>
                                     <span>Job Type: {job.job_type.split("_").join(" ")}</span>
                                     <span>{job.location}</span>
-                                </li>
+                                </li></Link>
                             </ul>
                         ));
                 })()}

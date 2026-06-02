@@ -2,7 +2,7 @@ import "./globals.css";
 
 export const metadata = {
   title: "Dreamjobs",
-  description: "Dreamjobs",
+  description: "Job Portal for candidates and companies",
 };
 
 export default function RootLayout({ children }) {

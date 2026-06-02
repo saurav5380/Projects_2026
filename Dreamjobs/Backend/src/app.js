@@ -3,6 +3,7 @@ const express = require("express");
 const healthRoutes = require("./routes/health.routes");
 const jobsRouter = require("../api/jobs");
 const authRouter = require("../api/auth");
+const companiesRouter = require("../api/companies");
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({extended: false}));
 
 app.get("/", (_req, res) => {
   res.json({ message: "Dreamjobs API" });
@@ -20,6 +22,7 @@ app.get("/", (_req, res) => {
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRouter);
 app.use("/api", jobsRouter);
+app.use("/api/companies", companiesRouter)
 
 app.use((req, res) => {
   res.status(404).json({ error: `Route not found: ${req.method} ${req.originalUrl}` });
