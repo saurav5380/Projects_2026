@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+  
+enum AlertType{
+  ABOVE
+  BELOW
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @db.VarChar(255) @unique
+  password_hash String @db.VarChar(255) 
+  name String @db.VarChar(100) 
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  watchlist Watchlist[]
+  coin_alert Coin_Alert[]
+}
+
+model Watchlist {
+  id Int @id @default(autoincrement())
+  user User @relation(fields:[user_id], references:[id], onDelete:Cascade)
+  user_id Int 
+  name String @db.VarChar(100)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  watchlist_coin Watchlist_Coin[]
+  @@index([user_id], map:"idx_watchlists_user")
+}
+
+model Coin {
+  id Int @id @default(autoincrement())
+  symbol String @db.VarChar(10) @unique
+  name String @db.VarChar(100)
+  coingecko_id String @db.VarChar(100) @unique 
+  created_at DateTime @default(now())
+  watchlist_coin Watchlist_Coin[]
+  coin_alert Coin_Alert[]
+  @@index([symbol], map:"idx_coins_symbol")
+}
+
+model Watchlist_Coin {
+  watchlist Watchlist @relation(fields:[watchlist_id], references:[id], onDelete:Cascade)
+  watchlist_id Int
+  coin Coin @relation(fields:[coin_id], references:[id], onDelete:Cascade)
+  coin_id Int
+  price_at_add Decimal @db.Decimal(15,8)
+  created_at DateTime @default(now())
+  @@id([watchlist_id, coin_id])
+  @@index([watchlist_id], map:"idx_watchlist_coins_watchlist")
+ }
+
+model Coin_Alert {
+  id Int @id @default(autoincrement())
+  user User @relation(fields:[user_id], references:[id], onDelete:Cascade)
+  user_id Int
+  coin Coin @relation(fields:[coin_id], references:[id], onDelete:Cascade)
+  coin_id Int
+  threshold_price Decimal @db.Decimal(15,8)
+  alert_type AlertType 
+  is_active Boolean @default(true)
+  triggered_at DateTime?
+  created_at DateTime @default(now())
+  @@index([user_id], map:"idx_coin_alerts_user")
+  @@index([coin_id], map:"idx_coin_alerts_coin")
+}
+
+
+
+
+
