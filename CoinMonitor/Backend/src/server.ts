@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import {type Request, type Response} from 'express';
+import authRouter from './routes/authRoutes.js';
 
 const app = express();
 
@@ -12,6 +13,8 @@ app.get("/", (req: Request, res: Response)=>{
 });
 
 const PORT = process.env.PORT || 3002;
+
+app.use("/auth", authRouter);
 
 app.listen(PORT, ()=>{
     console.log('Server running on PORT: ', PORT);
