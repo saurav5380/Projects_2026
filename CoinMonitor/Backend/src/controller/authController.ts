@@ -126,3 +126,15 @@ export const logout = (req: Request, res: Response) => {
     });
 };
 
+//=================================================== UserDetails =======================================================================//
+
+export const userDetails = (req: Request & {user?: {id?: number | string | undefined, email?: string | undefined, name?: string | undefined}} , res: Response) => {
+    if (!req.user) {
+        return res.status(401).json({message: "User not authenticated"});
+    }
+    return res.status(200).json({
+        id: req.user.id,
+        email: req.user.email,
+        name: req.user.name
+    });
+}
