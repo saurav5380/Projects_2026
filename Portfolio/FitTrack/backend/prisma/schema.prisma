@@ -11,3 +11,209 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Goal {
+  lose_weight
+  build_muscle
+  improve_endurance
+}
+
+enum ActivityLevel {
+  sedentary
+  lightly_active
+  moderately_active
+  very_active
+}
+
+enum Equipment {
+  none
+  dumbbells
+  full_gym
+}
+
+enum DietaryType {
+  omnivore
+  vegetarian
+  vegan 
+  keto
+}
+
+enum WeightUnit {
+  kg
+  lbs
+}
+
+enum HeightUnit {
+  cm
+  ft
+}
+
+model Users {
+  id Int @id @default(autoincrement())
+  name String 
+  email String @unique
+  password_hash String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  userprofile UserProfile[]
+  workout_plans WorkoutPlans[]
+  meal_plans MealPlans[]
+  workout_logs WorkoutLogs[]
+  meal_logs MealLogs[]
+  weight_logs WeightLogs[]
+  daily_tips DailyTips[]
+  @@map(users)
+}
+
+model UserProfile {
+  id Int @id @default(autoincrement())
+  user_id Int
+  age Int 
+  gender String @db.VarChar(10)
+  height Decimal @db.Decimal(5,2)
+  weight Decimal @db.Decimal (5,2)
+  body_fat_percentage Decimal? @db.Decimal(4,1)
+  goal Goal 
+  activity_level ActivityLevel
+  workout_days_per_week Int
+  workout_duration_minutes Int
+  equipment Equipment
+  dietary_type DietaryType
+  allergies String?
+  cuisine_preference String?
+  tdee Int
+  daily_calories_target Int
+  daily_protein_target_g Int
+  daily_carbs_target_g Int
+  daily_fat_target_g Int
+  notifications_enabled Boolean @default(false)
+  weight_unit WeightUnit
+  height_unit HeightUnit
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  users Users @relation(field:[user_id], references:[id], onDelete:Cascade)
+  @@map(user_profiles)
+}
+
+model WorkoutPlans {
+  id Int @id @default(autoincrement())
+  users Users @relation(field:[user_id], references:[id], onDelete:Cascade)
+  user_id Int
+  is_active Boolean @default(true)
+  generated_at DateTime @updatedAt
+  workout_days WorkoutDays[]
+  @@map(workout_plans)
+}
+
+model WorkoutDays {
+  id Int @id @default(autoincrement())
+  workout_plans WorkoutPlans @relation(field:[workout_plan_id], references:[id], onDelete:Cascade)
+  workout_plan_id Int 
+  day_of_week Int 
+  workout_name String @db.VarChar(100)
+  focus_area String @db.VarChar(100)
+  estimated_calories Int?
+  workout_logs WorkoutLogs[]
+  @@map(workout_days)
+}
+
+model Exercises {
+  id Int @id @default(autoincrement())
+  workout_days WorkoutDays @relation(field:[workout_day_id], references:[id], onDelete: Cascade)
+  workout_day_id Int
+  name String @db.VarChar(150)
+  sets Int
+  reps String? @db.VarChar(20)
+  duration_seconds Int?
+  rest_seconds Int?
+  display_order Int
+  @@map(exercises)
+}
+
+model MealPlans {
+  id Int @id @default(autoincrement())
+  workout_plan_id Int
+  user_id Int
+  workout_plans WorkoutPlans @relation(field:[workout_plan_id], references:[], onDelete:Cascade)
+  is_active Boolean @default(true)
+  generated_at DateTime @default(now)
+  meal_days MealDays[]
+  users Users @relation(field:[user_id], references:[id], onDelete:Cascade)
+  @@map(meal_plans)
+}
+
+model MealDays {
+  id Int @id @default(autoincrement())
+  meal_plan_id Int
+  day_of_week Int
+  meal_plans MealPlans @relation(field:[meal_plan_id], references:[id], onDelete:Cascade)
+  meals Meals[]
+  @@map(meal_days)
+}
+
+model Meals {
+  id Int @id @default(autoincrement())
+  meal_days MealDays @relation(field:[meal_day_id], references:[id], onDelete:Cascade)
+  meal_day_id Int
+  meal_type String @db.VarChar(20)
+  name String @db.VarChar(150)
+  description String
+  calories Int
+  protein_g Decimal @db.Decimal(6,1)
+  carbs_g Decimal @db.Decimal(6,1)
+  fat_g Decimal @db.Decimal(6,1)
+  ingredients String?
+  display_order Int 
+  meal_logs MealLogs[]
+  @@map(meals)
+}
+
+model WorkoutLogs {
+  id Int @id @default(autoincrement())
+  user_id Int
+  workout_day_id Int
+  completed_at DateTime @default(now())
+  duration Int?
+  efort_rating Int?
+  users Users @relation(field:[user_id], references:[id], onDelete:Cascade)
+  workout_days WorkoutDays @relation(field:[workout_day_id], references:[id], onDelete: Cascade)
+  @@map(workout_logs)
+}
+
+model MealLogs {
+  id Int @id @default(autoincrement())
+  user_id Int
+  meal_id Int
+  logged_date DateTime
+  meal_type String @db.VarChar(20)
+  custom_name String? @db.VarChar(150)
+  calories Int
+  protein_g Decimal @db.Decimal(6,1)
+  carbs_g Decimal @db.Decimal(6,1)
+  fat_g Decimal @db.Decimal(6,1)
+  logged_at DateTime @default(now())
+  users Users @relation(field:[user_id], references:[id], onDelete:Cascade)
+  meals Meals @relation(field:[meal_id], references:[id], onDelete:Cascade)
+  @@map(meal_logs)
+}
+
+model WeightLogs {
+  id Int @id @default(autoincrement())
+  user_id Int
+  weight_kg Decimal @db.Decimal(5,2)
+  logged_date DateTime @db.Date
+  logged_at DateTime @db.Timestamp() @default(now()) 
+  users Users @relation(field:[user_id], references:[id], onDelete:Cascade)
+  @@id([user_id, logged_date])
+  @@map(weight_logs)
+}
+
+model DailyTips {
+  id Int @id @default(autoincrement())
+  user_id Int
+  tip_text String
+  tip_date DateTime @db.Date
+  created_at DateTime @db.Timestamp() @default(now())
+  @@id([user_id, tip_date])
+  users Users @relation(field:[user_id], references:[id], onDelete:Cascade)
+}
