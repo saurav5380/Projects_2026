@@ -4,18 +4,16 @@ import prisma from "./db.js";
 // assumption - registered user exists in DB
 
 // Generate new JWT //
-export const generateToken = async (id:number) => {
+export const generateToken = async (username:string, email:string) => {
     try{
-    const SECRET_KEY = process.env.SECRET_KEY ? process.env.SECRET_KEY : "null"; 
-    const data = await prisma.users.findUnique({where:{
-        id: id
-    }})
-    if (!data){
-        return ("User does not exist")
+    const SECRET_KEY = process.env.SECRET_KEY; 
+    if (SECRET_KEY == null){
+        return "Secret key is not set"
     }
+    
     const userPayload = {
-        name: data.name,
-        email: data.email
+        username: username,
+        email: email
     }
     const token = jwt.sign(userPayload, SECRET_KEY,
                         {
