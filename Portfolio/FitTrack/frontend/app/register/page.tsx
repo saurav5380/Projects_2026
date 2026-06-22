@@ -1,11 +1,5 @@
 "use client"
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Field } from "@/components/ui/field";
-import { Separator } from "@/components/ui/separator";
-
 import { useState } from "react";
 import {
   Breadcrumb,
@@ -14,61 +8,75 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
+} from "@/components/ui/breadcrumb";
+
+import BodyStats from "./steps/BodyStats";
+import ActivityLevel from "./steps/ActivityLevel";
+import DietaryPreferences from "./steps/DietaryPreferences";
+import WorkoutPreferences from "./steps/WorkoutPreferences";
+import FitnessGoal from "./steps/FitnessGoal";
+import { UserActivityLevel, UserBodyStats, UserDietaryPreferences, UserFitnessGoal, UserWorkoutPreferences } from "@/utils/types";
 
 const Registration = () => {
     const [step, setStep] = useState<number>(1);
-    
-    // type formFields = {
-    //     name: string,
-    //     email: string,
-    //     password:string
-    // }
+    const [userData, setUserData] = useState<{
+        bodyStats: UserBodyStats;
+        fitnessGoal:UserFitnessGoal,
+        activityLevel:UserActivityLevel,
+        workoutPreferences:UserWorkoutPreferences,
+        dietaryPreferences:UserDietaryPreferences
+    }>({
+         bodyStats: {} as UserBodyStats,
+         fitnessGoal: {} as UserFitnessGoal,
+         activityLevel: {} as UserActivityLevel,
+         workoutPreferences: {} as UserWorkoutPreferences,
+         dietaryPreferences: {} as UserDietaryPreferences
+    })
 
-    // const userSchema = z.object({
-    //     name: z.string(),
-    //     email: z.email(),
-    //     password:z.string()
-    //         .min(8) 
-    //         .max(16)
-    //         .refine(val=> val.includes('@'))
-    //         .trim()
-        
-    // })
-
-    // type User = z.infer<typeof userSchema> 
-    
-    // const {register, handleSubmit, formState: {errors}} = useForm<formFields>();
-    // const formSubmit: SubmitHandler<formFields> = (data) => {console.log(data)};
-    
+    const handleBodyStatsUpdate = (data: UserBodyStats) => {
+        setUserData(prev => ({ ...prev, bodyStats: data }));
+        setStep(2);
+    }
 
     return (
         <>
-     {/* <Breadcrumb>
+        <Breadcrumb className="mt-2 ml-6">
             <BreadcrumbList>
                 <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                <BreadcrumbPage>Body Stats</BreadcrumbPage>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
+                
                 <BreadcrumbItem>
-                <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+                <BreadcrumbLink>Fitness Goal</BreadcrumbLink>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator />
+                
                 <BreadcrumbItem>
-                <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+                <BreadcrumbLink>Activity Level</BreadcrumbLink>
                 </BreadcrumbItem>
+                <BreadcrumbSeparator />
+
+                <BreadcrumbItem>
+                <BreadcrumbLink>Workout Preferences</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+
+                <BreadcrumbItem>
+                <BreadcrumbLink>Dietary Preferences</BreadcrumbLink>
+                </BreadcrumbItem>
+               
             </BreadcrumbList>
-        </Breadcrumb> */}
-        {/* <form onSubmit={handleSubmit(formSubmit)}> */}
-            <div className="flex flex-col w-3/4">
-                {/* <input {...register("name")} type="text" name="name" placeholder="Enter name" className="mx-auto mt-2 border rounded-md border-gray-500 px-2"/>
-                <input {...register("email")} type="email" name="email" placeholder="Enter email" className="mx-auto mt-2 border rounded-md border-gray-500 px-2"/>
-                <input {...register("password")} type="password" name="password" placeholder="Enter password" className="mx-auto mt-2 border rounded-md border-gray-500 px-2"/>
-                <button type="submit" className="mx-auto mt-2 border rounded-md border-gray-500 px-2">Submit</button> */}
-            </div>
-        {/* </form> */}
+        </Breadcrumb>
+
+       
+       
+        <div className="w-full">
+            {step === 1 && <BodyStats userData={userData.bodyStats} onUpdate={handleBodyStatsUpdate}/>}
+        </div>
+       
         
-        
+         
         </>
     )
 }
