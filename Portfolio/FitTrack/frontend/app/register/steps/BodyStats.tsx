@@ -42,9 +42,10 @@ const BodyStats = ({ userData, onUpdate }: BodyStatsProps) => {
 
     return (
         <>
-
+       
         <form onSubmit={handleSubmit(formSubmit)}>
-            <div className="flex flex-col gap-2 mx-auto w-96 justify-center items-center mt-6">
+            <div className="flex flex-col gap-4 mx-auto w-96 justify-center items-center mt-6">
+                <h2 className="text-xl font-bold text-zinc-50">Body Stats</h2>
             <Field>
                 <Input {...register("age")} type="text" placeholder="Enter Age" className="px-8 py-1 border rounded-md border-gray-500"/>
                 <FieldError errors={errors.age ? [errors.age] : undefined}/>
@@ -65,7 +66,7 @@ const BodyStats = ({ userData, onUpdate }: BodyStatsProps) => {
                 <Input {...register("bodyFatPercentage")} type="text" placeholder="Enter Body Fat Percentage" className="px-8 py-1 border rounded-md border-gray-500"/>
                 <FieldError errors={errors.bodyFatPercentage ? [errors.bodyFatPercentage] : undefined}/>
             </Field>
-            <Button>Submit</Button>
+            <Button className="p-4 bg-[#FF6B35]">{'Next >'}</Button>
             </div>
 
         </form>
