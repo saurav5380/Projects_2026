@@ -40,7 +40,7 @@ const Registration = () => {
 
     return (
         <>
-         <div className="bg-[linear-gradient(135deg,#0F0F0F_0%,#1A1A2E_100%)] w-full min-h-screen">
+         <div className="bg-[linear-gradient(135deg,#0F0F0F_0%,#1F1810_100%)] w-full min-h-screen">
            
         <Breadcrumb className="mt-2 ml-6 text-[#FF6B35] cursor-pointer">
             <BreadcrumbList>
