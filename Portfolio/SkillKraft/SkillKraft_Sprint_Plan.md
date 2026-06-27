@@ -21,20 +21,20 @@ Backend (BE) and Frontend (FE) tasks are labelled. Days that mix both are intent
 
 ### Day 1 — Monorepo Setup and Backend Bootstrap
 
-- Initialise monorepo root with `package.json`, `.gitignore`, `.env.example`, `README.md`
-- Add `concurrently` to root to run both apps with `npm run dev`
-- Scaffold `backend/` with TypeScript: `tsconfig.json`, `nodemon.json`, `package.json`
-- Install backend dependencies: `express`, `typescript`, `ts-node`, `nodemon`, `zod`, `dotenv`, `cors`, `helmet`
-- Create `backend/src/app.ts` — Express app with `cors`, `helmet`, `express.json()` middleware
-- Create `backend/src/config/env.ts` — Zod-validated environment variable loader
-- Create `backend/src/utils/asyncHandler.ts` — async error forwarding wrapper
-- Create `backend/src/middleware/errorHandler.ts` — global error handler returning standard error envelope
-- Verify: `npm run dev` starts backend on port 4000, `GET /` returns 200
+✅ Initialise monorepo root with `package.json`, `.gitignore`, `.env.example`, `README.md`
+✅ Add `concurrently` to root to run both apps with `npm run dev`
+✅ Scaffold `backend/` with TypeScript: `tsconfig.json`, `nodemon.json`, `package.json`
+✅ Install backend dependencies: `express`, `typescript`, `ts-node`, `nodemon`, `zod`, `dotenv`, `cors`, `helmet`
+✅ Create `backend/src/app.ts` — Express app with `cors`, `helmet`, `express.json()` middleware
+✅ Create `backend/src/config/env.ts` — Zod-validated environment variable loader
+✅ Create `backend/src/utils/asyncHandler.ts` — async error forwarding wrapper
+✅ Create `backend/src/middleware/errorHandler.ts` — global error handler returning standard error envelope
+✅ Verify: `npm run dev` starts backend on port 3002, `GET /` returns 200
 
 ### Day 2 — Database Setup and Prisma Schema
 
-- Install PostgreSQL locally; create `skillkraft` database
-- Install `prisma` and `@prisma/client`; initialise with `npx prisma init`
+✅ Install PostgreSQL locally; create `skillkraft` database
+✅ Install `prisma` and `@prisma/client`; initialise with `npx prisma init`
 - Write complete `prisma/schema.prisma` from Database Schema artefact: all 10 models, enums, relations, cascade rules
 - Run `npx prisma migrate dev --name init` — verify migration succeeds with zero errors
 - Create `backend/src/db/prisma.ts` — singleton Prisma client

@@ -185,7 +185,7 @@ frontend/
 │   │   └── register/
 │   │       └── page.tsx             # /register
 │   │
-│   ├── (app)/                       # Route group: authenticated pages (shared app layout)
+│   ├── (protected)/                       # Route group: authenticated pages (shared app layout)
 │   │   ├── layout.tsx               # App shell: sidebar, topbar, auth guard
 │   │   ├── onboarding/
 │   │   │   └── page.tsx             # /onboarding — multi-step wizard
@@ -275,7 +275,7 @@ frontend/
 │   └── utils.ts                     # cn() helper for merging Tailwind class names
 │
 ├── providers/
-│   └── AppProviders.tsx             # Wraps app with QueryClientProvider, AuthProvider
+│   └── AppProviders.tsx             # Wraps app with QueryClientProvider (TanStack), AuthProvider
 │
 ├── types/
 │   └── api.types.ts                 # TypeScript interfaces mirroring API response shapes
