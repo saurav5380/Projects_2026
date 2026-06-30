@@ -1,7 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
   provider = "prisma-client"
@@ -12,3 +9,219 @@ datasource db {
   provider = "postgresql"
 }
 
+
+model User {
+  id               String         @id @default(uuid())
+  email            String         @unique
+  passwordHash     String
+  firstName        String
+  lastName         String
+  currentRole      String?        // filled during onboarding
+  targetRole       String?        // filled during onboarding
+  weeklyHours      Int?           // 2–20, filled during onboarding
+  targetMonths     Int?           // 3, 6, or 12, filled during onboarding
+  onboardingDone   Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  roadmaps         Roadmap[]
+  weeklyReviews    WeeklyReview[]
+  topicProgress    UserTopicProgress[]
+  quizAttempts     QuizAttempt[]
+  refreshTokens    RefreshToken[]
+  bookmarks        UserResourceBookmark[]
+}
+
+// ─────────────────────────────────────────
+// REFRESH TOKEN
+// Stored server-side to support token rotation and revocation.
+// ─────────────────────────────────────────
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  revokedAt   DateTime?
+}
+
+// ─────────────────────────────────────────
+// ROADMAP
+// One active roadmap per user (archivedAt is null).
+// Previous roadmaps are kept with archivedAt set.
+// ─────────────────────────────────────────
+
+model Roadmap {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String          // e.g. "Marketing Manager → Product Manager"
+  archivedAt  DateTime?       // null = active; set = archived
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  phases      RoadmapPhase[]
+}
+
+// ─────────────────────────────────────────
+// ROADMAP PHASE
+// e.g. "Phase 1: Foundations", "Phase 2: Core Skills"
+// ─────────────────────────────────────────
+
+model RoadmapPhase {
+  id         String   @id @default(uuid())
+  roadmapId  String
+  roadmap    Roadmap  @relation(fields: [roadmapId], references: [id], onDelete: Cascade)
+  title      String
+  order      Int      // 1-based, controls display order
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  topics     Topic[]
+}
+
+// ─────────────────────────────────────────
+// TOPIC
+// A single learning unit within a phase.
+// isCheckpoint = true means the user must pass a quiz to mark it complete.
+// ─────────────────────────────────────────
+
+model Topic {
+  id              String       @id @default(uuid())
+  phaseId         String
+  phase           RoadmapPhase @relation(fields: [phaseId], references: [id], onDelete: Cascade)
+  title           String
+  description     String       // 2–4 sentences, AI-generated
+  estimatedHours  Float
+  isCheckpoint    Boolean      @default(false)
+  order           Int          // 1-based, controls display order within phase
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  resources       Resource[]
+  quizAttempts    QuizAttempt[]
+  userProgress    UserTopicProgress[]
+}
+
+// ─────────────────────────────────────────
+// RESOURCE
+// AI-generated resources for a topic.
+// No direct URL stored — searchQuery is used to construct a Google search link.
+// Users can also add their own resources (source = "user").
+// Bookmarks are tracked in UserResourceBookmark, not here,
+// so multiple users can each bookmark the same resource independently.
+// ─────────────────────────────────────────
+
+enum ResourceType {
+  ARTICLE
+  COURSE
+  DOCUMENTATION
+  VIDEO
+}
+
+enum ResourceSource {
+  AI        // generated during roadmap creation
+  USER      // manually added by the user
+}
+
+model Resource {
+  id            String                  @id @default(uuid())
+  topicId       String
+  topic         Topic                   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title         String
+  searchQuery   String                  // used to build Google search URL on the frontend
+  resourceType  ResourceType
+  source        ResourceSource          @default(AI)
+  addedByUserId String?                 // only set when source = USER; loose reference, not a FK
+  createdAt     DateTime                @default(now())
+
+  bookmarks     UserResourceBookmark[]
+}
+
+// ─────────────────────────────────────────
+// USER RESOURCE BOOKMARK
+// Join table between User and Resource.
+// Replaces the isBookmarked boolean that was previously on Resource.
+// This allows each user to maintain their own independent bookmark list,
+// and is safe for future multi-user or shared-roadmap scenarios.
+// ─────────────────────────────────────────
+
+model UserResourceBookmark {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resourceId  String
+  resource    Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  bookmarkedAt DateTime @default(now())
+
+  @@unique([userId, resourceId])
+}
+
+// ─────────────────────────────────────────
+// USER TOPIC PROGRESS
+// Join table between User and Topic with status and activity tracking.
+// lastActivityAt is updated every time the user changes the status.
+// This field is used for streak calculation.
+// ─────────────────────────────────────────
+
+enum TopicStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETE
+}
+
+model UserTopicProgress {
+  id              String      @id @default(uuid())
+  userId          String
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId         String
+  topic           Topic       @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  status          TopicStatus @default(NOT_STARTED)
+  lastActivityAt  DateTime    @default(now())
+  completedAt     DateTime?   // set when status changes to COMPLETE
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([userId, topicId])
+}
+
+// ─────────────────────────────────────────
+// QUIZ ATTEMPT
+// A snapshot of a single quiz session.
+// questions stores the full JSON of what was generated and shown.
+// answers stores the user's selected option index per question.
+// score is the number of correct answers (0–5).
+// ─────────────────────────────────────────
+
+model QuizAttempt {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId     String
+  topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  questions   Json     // snapshot: Array<{ question, options: string[], correctIndex: number }>
+  answers     Json     // user's responses: Array<number> (selected option index per question)
+  score       Int      // 0–5
+  passed      Boolean  // true if score >= 4
+  attemptedAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────
+// WEEKLY REVIEW
+// AI-generated narrative stored after each Sunday cron run (or manual trigger).
+// ─────────────────────────────────────────
+
+model WeeklyReview {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStartDate     DateTime // Monday of the reviewed week (for display and deduplication)
+  narrative         String   // AI-generated summary, 200–300 words
+  topicsCompleted   Int      // count for the week
+  avgQuizScore      Float?   // average quiz score for the week (null if no quizzes taken)
+  nextTopicTitle    String?  // AI-suggested next topic title
+  nextTopicReason   String?  // one-sentence reason from AI
+  generatedAt       DateTime @default(now())
+}

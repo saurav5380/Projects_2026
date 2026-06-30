@@ -9,27 +9,23 @@ type handlerError = {
     details: string[]
 }
 
-const globalErrorHandler = (error:handlerError, req:Request, res:Response, next: NextFunction) =>{
+const globalErrorHandler = (error: handlerError, req: Request, res: Response, next: NextFunction) => {
     const statusCode: number = error.statusCode;
-    switch(statusCode){
+    switch (statusCode) {
         case 401:
-            return res.status(401).json({
-                success: false,
-                message:"Check username and password",
-                details: error.details
-            });
-        case 403: 
-            return res.status(403).json({message:"Unauthorised"});
+            return res.status(401).json({ success: false, message: "Check username and password", details: error.details });
+        case 403:
+            return res.status(403).json({success: false, message: "Unauthorised",details: error.details });
         case 400:
-            return res.status(400).json({message:"Bad request"});
+            return res.status(400).json({success: false, message: "Bad request", details: error.details });
         case 409:
-            return res.status(409).json({message:"Conflict. Duplicate resource"});
+            return res.status(409).json({ suceess: false, message: "Conflict. Duplicate resource", details: error.details });
         case 422:
-            return res.status(422).json({message:"Request failed validation parameters"});
-        case 404: 
-            return res.status(404).json({message:"Resource not found"});
+            return res.status(422).json({ success: false, message: "Request failed validation parameters", details: error.details });
+        case 404:
+            return res.status(404).json({ success: false, message: "Resource not found", details: error.details });
         default:
-            return res.status(500).json({message:"Internal Server Error"});
+            return res.status(500).json({ success: false, message: "Internal Server Error", details: error.details });
     }
 }
 

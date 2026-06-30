@@ -35,9 +35,9 @@ Backend (BE) and Frontend (FE) tasks are labelled. Days that mix both are intent
 
 ✅ Install PostgreSQL locally; create `skillkraft` database
 ✅ Install `prisma` and `@prisma/client`; initialise with `npx prisma init`
-- Write complete `prisma/schema.prisma` from Database Schema artefact: all 10 models, enums, relations, cascade rules
-- Run `npx prisma migrate dev --name init` — verify migration succeeds with zero errors
-- Create `backend/src/db/prisma.ts` — singleton Prisma client
+✅ Write complete `prisma/schema.prisma` from Database Schema artefact: all 10 models, enums, relations, cascade rules
+✅ Run `npx prisma migrate dev --name init` — verify migration succeeds with zero errors
+✅ Create `backend/src/db/prisma.ts` — singleton Prisma client
 - Run `npx prisma studio` — visually verify all tables were created correctly
 - Add index recommendations from schema artefact as a second migration: `npx prisma migrate dev --name add-indexes`
 
