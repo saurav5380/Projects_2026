@@ -38,13 +38,13 @@ Backend (BE) and Frontend (FE) tasks are labelled. Days that mix both are intent
 ✅ Write complete `prisma/schema.prisma` from Database Schema artefact: all 10 models, enums, relations, cascade rules
 ✅ Run `npx prisma migrate dev --name init` — verify migration succeeds with zero errors
 ✅ Create `backend/src/db/prisma.ts` — singleton Prisma client
-- Run `npx prisma studio` — visually verify all tables were created correctly
-- Add index recommendations from schema artefact as a second migration: `npx prisma migrate dev --name add-indexes`
+✅  Run `npx prisma studio` — visually verify all tables were created correctly
+✅ Add index recommendations from schema artefact as a second migration: `npx prisma migrate dev --name add-indexes`
 
 ### Day 3 — Auth Utilities and Validators
 
-- Install `bcrypt`, `jsonwebtoken`, `@types/bcrypt`, `@types/jsonwebtoken`
-- Create `backend/src/utils/jwt.ts` — `signAccessToken`, `signRefreshToken`, `verifyToken`
+✅ Install `bcrypt`, `jsonwebtoken`, `@types/bcrypt`, `@types/jsonwebtoken`
+✅  Create `backend/src/utils/jwt.ts` — `signAccessToken`, `signRefreshToken`, `verifyToken`
 - Create `backend/src/utils/password.ts` — `hashPassword`, `comparePassword`
 - Create `backend/src/types/express.d.ts` — augment `Request` to include `req.user`
 - Create `backend/src/types/api.types.ts` — TypeScript interfaces for all response shapes

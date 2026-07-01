@@ -63,6 +63,7 @@ model Roadmap {
   updatedAt   DateTime        @updatedAt
 
   phases      RoadmapPhase[]
+  @@index([userId, archivedAt])
 }
 
 // ─────────────────────────────────────────
@@ -78,7 +79,6 @@ model RoadmapPhase {
   order      Int      // 1-based, controls display order
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
   topics     Topic[]
 }
 
@@ -157,6 +157,8 @@ model UserResourceBookmark {
   bookmarkedAt DateTime @default(now())
 
   @@unique([userId, resourceId])
+  @@index([userId])
+  
 }
 
 // ─────────────────────────────────────────
@@ -185,6 +187,7 @@ model UserTopicProgress {
   updatedAt       DateTime    @updatedAt
 
   @@unique([userId, topicId])
+  @@index([userId, lastActivityAt])
 }
 
 // ─────────────────────────────────────────
@@ -206,6 +209,7 @@ model QuizAttempt {
   score       Int      // 0–5
   passed      Boolean  // true if score >= 4
   attemptedAt DateTime @default(now())
+  @@index([userId, topicId, attemptedAt])
 }
 
 // ─────────────────────────────────────────
