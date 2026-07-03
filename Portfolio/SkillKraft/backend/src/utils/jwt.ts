@@ -2,12 +2,7 @@
 import * as jwt from 'jsonwebtoken';
 import type {Request, Response, NextFunction} from 'express';
 
-// type userData = {
-//     id: string,
-//     firstName: string,
-//     lastName:string,
-//     email: string
-// }
+
 
 // access token - short lived - 15 mins
 

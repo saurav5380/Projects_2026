@@ -44,11 +44,11 @@ Backend (BE) and Frontend (FE) tasks are labelled. Days that mix both are intent
 ### Day 3 — Auth Utilities and Validators
 
 ✅ Install `bcrypt`, `jsonwebtoken`, `@types/bcrypt`, `@types/jsonwebtoken`
-✅  Create `backend/src/utils/jwt.ts` — `signAccessToken`, `signRefreshToken`, `verifyToken`
-- Create `backend/src/utils/password.ts` — `hashPassword`, `comparePassword`
-- Create `backend/src/types/express.d.ts` — augment `Request` to include `req.user`
-- Create `backend/src/types/api.types.ts` — TypeScript interfaces for all response shapes
-- Create `backend/src/validators/auth.validators.ts` — Zod schemas: `RegisterBody`, `LoginBody`, `RefreshBody`
+✅ Create `backend/src/utils/jwt.ts` — `signAccessToken`, `signRefreshToken`, `verifyToken`
+✅ Create `backend/src/utils/password.ts` — `hashPassword`, `comparePassword`
+✅ Create `backend/src/types/express.d.ts` — augment `Request` to include `req.user`
+- Create `backend/src/types/api.types.ts` — TypeScript interfaces for all response shapes ( will be done as and when required)
+✅ Create `backend/src/validators/auth.validators.ts` — Zod schemas: `RegisterBody`, `LoginBody`, `RefreshBody`
 - Create `backend/src/middleware/validateBody.ts` — generic Zod validation middleware factory
 - Create `backend/src/middleware/authenticate.ts` — JWT verification middleware
 
