@@ -7,9 +7,7 @@ if (!DATABASE_URL){
     throw new Error ('Database URL is not set')
 }
 
-const adapter = new PrismaPg({connectionString: DATABASE_URL})
-
-const prisma = new PrismaClient({adapter});
+const prisma = new PrismaClient({adapter: new PrismaPg({connectionString: DATABASE_URL})});
 
 export default prisma;
 

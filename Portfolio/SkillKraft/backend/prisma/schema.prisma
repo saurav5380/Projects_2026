@@ -10,6 +10,10 @@ datasource db {
 }
 
 
+// ─────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────
+
 model User {
   id               String         @id @default(uuid())
   email            String         @unique
@@ -30,6 +34,7 @@ model User {
   quizAttempts     QuizAttempt[]
   refreshTokens    RefreshToken[]
   bookmarks        UserResourceBookmark[]
+  explainSessions  ExplainSession[]       // [v1.2]
 }
 
 // ─────────────────────────────────────────
@@ -63,7 +68,6 @@ model Roadmap {
   updatedAt   DateTime        @updatedAt
 
   phases      RoadmapPhase[]
-  @@index([userId, archivedAt])
 }
 
 // ─────────────────────────────────────────
@@ -79,6 +83,7 @@ model RoadmapPhase {
   order      Int      // 1-based, controls display order
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
   topics     Topic[]
 }
 
@@ -100,18 +105,20 @@ model Topic {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
-  resources       Resource[]
-  quizAttempts    QuizAttempt[]
-  userProgress    UserTopicProgress[]
+  resources        Resource[]
+  quizAttempts     QuizAttempt[]
+  userProgress     UserTopicProgress[]
+  explainSessions  ExplainSession[]    // [v1.2]
 }
 
 // ─────────────────────────────────────────
-// RESOURCE
-// AI-generated resources for a topic.
-// No direct URL stored — searchQuery is used to construct a Google search link.
-// Users can also add their own resources (source = "user").
-// Bookmarks are tracked in UserResourceBookmark, not here,
-// so multiple users can each bookmark the same resource independently.
+// RESOURCE [v1.2 — updated]
+// v1.2 changes:
+//   - url field added: real URL from web search result (null if unverified)
+//   - verificationStatus added: VERIFIED or UNVERIFIED
+//   - flaggedForRevalidation added: set true by "Report broken link"; cleared by cron job
+//   - searchQuery retained: used as Google fallback when verificationStatus = UNVERIFIED
+// For USER-added resources, url is set directly and verificationStatus = VERIFIED by default.
 // ─────────────────────────────────────────
 
 enum ResourceType {
@@ -126,18 +133,104 @@ enum ResourceSource {
   USER      // manually added by the user
 }
 
+enum VerificationStatus {
+  VERIFIED    // search + HEAD check passed; url is a confirmed live link
+  UNVERIFIED  // search or HEAD check failed; url is null; searchQuery used as fallback
+}
+
 model Resource {
-  id            String                  @id @default(uuid())
-  topicId       String
-  topic         Topic                   @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  title         String
-  searchQuery   String                  // used to build Google search URL on the frontend
-  resourceType  ResourceType
-  source        ResourceSource          @default(AI)
-  addedByUserId String?                 // only set when source = USER; loose reference, not a FK
-  createdAt     DateTime                @default(now())
+  id                   String             @id @default(uuid())
+  topicId              String
+  topic                Topic              @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  title                String
+  url                  String?            // [v1.2] real URL from search result; null if UNVERIFIED
+  searchQuery          String             // retained as Google fallback for UNVERIFIED resources
+  resourceType         ResourceType
+  source               ResourceSource     @default(AI)
+  verificationStatus   VerificationStatus @default(UNVERIFIED) // [v1.2]
+  flaggedForRevalidation Boolean          @default(false)       // [v1.2] set by "Report broken link"
+  addedByUserId        String?            // only set when source = USER; loose reference, not a FK
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt            // [v1.2] needed for revalidation tracking
 
   bookmarks     UserResourceBookmark[]
+}
+
+// ─────────────────────────────────────────
+// AI CALL LOG [v1.2 — new]
+// Append-only observability log for every call made through AIClient.
+// Intentionally has NO foreign key relationships — it is infrastructure,
+// not an application entity. userId stored as plain string for cost attribution.
+// Non-AI jobs (e.g. resource revalidation) also log here with null token counts.
+// ─────────────────────────────────────────
+
+enum AIProvider {
+  OPENAI
+  ANTHROPIC
+  NONE      // for non-AI jobs logged here for observability consistency
+}
+
+model AICallLog {
+  id              String     @id @default(uuid())
+  userId          String?    // plain string, not a FK; null for system-level jobs
+  featureName     String     // e.g. "generate-roadmap", "generate-quiz", "resource-revalidation"
+  provider        AIProvider
+  model           String?    // e.g. "gpt-4o", "claude-sonnet-3-5"; null for NONE provider
+  promptTokens    Int?       // null for non-AI jobs or failed calls before token info returned
+  completionTokens Int?      // null for same reasons
+  latencyMs       Int        // wall-clock time of the call in milliseconds
+  success         Boolean
+  errorMessage    String?    // populated on failure; null on success
+  usedFallback    Boolean    @default(false) // [v1.2] true if Anthropic was used as fallback
+  createdAt       DateTime   @default(now())
+}
+
+// ─────────────────────────────────────────
+// EXPLAIN SESSION [v1.2 — new]
+// Persists server-side conversation state for the concept explanation panel.
+// One session per user per topic, enforced by @@unique.
+// turns stores the full conversation as JSON: Array<{ role: "user"|"assistant", content: string }>
+// Capped at 10 turns; oldest pruned when cap is reached.
+// Deleted by cleanup cron job after 24 hours of inactivity.
+// ─────────────────────────────────────────
+
+model ExplainSession {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId       String
+  topic         Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  turns         Json     // Array<{ role: "user"|"assistant", content: string }>
+  lastActiveAt  DateTime @default(now()) // updated on every new turn; used by cleanup cron
+  createdAt     DateTime @default(now())
+
+  ratings       ExplainRating[]
+
+  @@unique([userId, topicId])
+}
+
+// ─────────────────────────────────────────
+// EXPLAIN RATING [v1.2 — new]
+// One row per thumbs-up or thumbs-down on an assistant turn.
+// turnIndex is the 0-based index of the assistant turn in ExplainSession.turns.
+// Stored separately from ExplainSession for clean aggregation queries.
+// ─────────────────────────────────────────
+
+enum ExplainRatingValue {
+  THUMBS_UP
+  THUMBS_DOWN
+}
+
+model ExplainRating {
+  id              String             @id @default(uuid())
+  sessionId       String
+  session         ExplainSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId          String             // denormalised for query convenience; mirrors session.userId
+  turnIndex       Int                // 0-based index of the assistant turn being rated
+  rating          ExplainRatingValue
+  createdAt       DateTime           @default(now())
+
+  @@unique([sessionId, turnIndex])   // one rating per turn per session
 }
 
 // ─────────────────────────────────────────
@@ -157,8 +250,6 @@ model UserResourceBookmark {
   bookmarkedAt DateTime @default(now())
 
   @@unique([userId, resourceId])
-  @@index([userId])
-  
 }
 
 // ─────────────────────────────────────────
@@ -187,7 +278,6 @@ model UserTopicProgress {
   updatedAt       DateTime    @updatedAt
 
   @@unique([userId, topicId])
-  @@index([userId, lastActivityAt])
 }
 
 // ─────────────────────────────────────────
@@ -209,7 +299,6 @@ model QuizAttempt {
   score       Int      // 0–5
   passed      Boolean  // true if score >= 4
   attemptedAt DateTime @default(now())
-  @@index([userId, topicId, attemptedAt])
 }
 
 // ─────────────────────────────────────────
@@ -218,14 +307,15 @@ model QuizAttempt {
 // ─────────────────────────────────────────
 
 model WeeklyReview {
-  id                String   @id @default(uuid())
-  userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  weekStartDate     DateTime // Monday of the reviewed week (for display and deduplication)
-  narrative         String   // AI-generated summary, 200–300 words
-  topicsCompleted   Int      // count for the week
-  avgQuizScore      Float?   // average quiz score for the week (null if no quizzes taken)
-  nextTopicTitle    String?  // AI-suggested next topic title
-  nextTopicReason   String?  // one-sentence reason from AI
-  generatedAt       DateTime @default(now())
+  id                          String   @id @default(uuid())
+  userId                      String
+  user                        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weekStartDate               DateTime // Monday of the reviewed week (for display and deduplication)
+  narrative                   String   // AI-generated summary, 200–300 words
+  topicsCompleted             Int      // count for the week
+  avgQuizScore                Float?   // average quiz score for the week (null if no quizzes taken)
+  careerReadinessScoreAtReview Int?    // [v1.2] snapshot of score at time of review generation
+  nextTopicTitle              String?  // AI-suggested next topic title
+  nextTopicReason             String?  // one-sentence reason from AI
+  generatedAt                 DateTime @default(now())
 }
