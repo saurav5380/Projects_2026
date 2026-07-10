@@ -1,12 +1,12 @@
 
 import * as jwt from 'jsonwebtoken';
-import type {Request, Response, NextFunction} from 'express';
+import type {Request, Response} from 'express';
 
 
 
 // access token - short lived - 15 mins
 
-export const signAccessToken = (req:Request, res: Response, next: NextFunction) => {
+export const signAccessToken = (req:Request, res: Response) => {
     try{
         const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -28,11 +28,11 @@ export const signAccessToken = (req:Request, res: Response, next: NextFunction) 
             res.status(500).json({message: error.message})
         }
     }
-    next();
+    
 }
 
 //session management - check if user token is valid
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = (req: Request, res: Response) => {
     try{
         const SECRET_KEY = process.env.SECRET_KEY;
         if (!SECRET_KEY){
@@ -41,18 +41,18 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
         const token = req.body.token;
         const userData = jwt.verify(token, SECRET_KEY);
         res.status(200).json(userData);
+
     }
     catch(error){
         if (error instanceof Error){
             res.status(401).json({message: error.message});
         }
     }
-    next();
 }
     
 
 // refresh token - long expiry - 48 hours
-export const signRefreshToken = (req: Request, res: Response, next: NextFunction) => {
+export const signRefreshToken = (req: Request, res: Response) => {
     try{
         const SECRET_KEY = process.env.SECRET_KEY;
         if(!SECRET_KEY){
@@ -65,7 +65,6 @@ export const signRefreshToken = (req: Request, res: Response, next: NextFunction
             expiresIn: '48h'
         })
         res.status(200).json(refershToken);
-
     }
     catch(error){
         if (error instanceof Error){
@@ -75,7 +74,7 @@ export const signRefreshToken = (req: Request, res: Response, next: NextFunction
         }
     }
     
-    next();
+    
 }
 
 

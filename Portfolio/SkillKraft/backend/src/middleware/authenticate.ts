@@ -1,8 +1,8 @@
-import type {Request, Response, NextFunction} from 'express'
+import type {Request, Response} from 'express'
 import jwt from 'jsonwebtoken'
 
 
-const authenticate = (req: Request, res: Response, next: NextFunction) => {
+const authenticate = (req: Request, res: Response) => {
     try{
         const SECRET_KEY = process.env.SECRET_KEY;
         if (!SECRET_KEY){
@@ -25,7 +25,6 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
         res.status(200).json({
             data: payload
         })
-        next();
 
     }
     catch(error){
