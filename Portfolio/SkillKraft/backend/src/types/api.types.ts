@@ -8,4 +8,7 @@ export type NewUser = {
 
 
 
-
+export type UserDataForJWT = {
+    userId: string,
+    email: string,
+}
