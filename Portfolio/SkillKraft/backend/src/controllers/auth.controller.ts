@@ -1,11 +1,9 @@
-//request parsing, service call, response formatting
-// register, login, refresh, logout
 
 import type {Request, Response, NextFunction} from 'express';
-import {register, login, refresh} from '../services/auth.service.js';
-import { success } from 'zod';
+import {register, login, refresh, logout} from '../services/auth.service.js';
 
-export const registerController = async (req:Request, res:Response) => {
+export const registerController = async (req:Request, res:Response, next: NextFunction) => {
+    try{
     const firstName = String(req.user?.firstName);
     const lastName = String(req.user?.lastName);
     const email = String(req.user?.email);
@@ -20,6 +18,53 @@ export const registerController = async (req:Request, res:Response) => {
         success: true,
         data: result
     })
-} 
+    }
+    catch(error){
+        next(error);
+    }
 
+}; 
+
+export const loginController = async (req:Request, res:Response, next: NextFunction) =>{
+    try{
+    const email = String(req.user?.email);
+    const password = String(req.user?.password);
+    const result = await login(email,password);
+    res.status(200).json({
+        success: true,
+        data: result
+    })
+    }
+    catch(error){
+        next(error)
+    }
+}
+
+export const refreshController = async(req:Request, res:Response, next:NextFunction) =>{
+    try{
+        const currToken = String(req.user?.refreshToken);
+        const result = await refresh(currToken);
+        res.status(200).json({
+            success: true,
+            data: result
+        })
+    }
+    catch(error){
+        next(error)
+    }
+}
+
+export const logoutController = async(req:Request, res:Response, next: NextFunction) => {
+    try{
+        const currToken = String(req.user?.refreshToken);
+        const result = logout(currToken);
+        res.status(200).json({
+            success: true,
+            data: result
+        })
+    }
+    catch(error){
+        next(error)
+    }
+}
 

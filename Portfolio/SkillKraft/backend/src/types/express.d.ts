@@ -14,6 +14,8 @@ declare global {
                 weeklyHours: number,
                 targetMonths: number,
                 onboardingDone: boolean,
+                accessToken: string,
+                refreshToken:string
             }
         }
     }

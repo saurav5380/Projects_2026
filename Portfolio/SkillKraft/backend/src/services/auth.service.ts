@@ -80,3 +80,15 @@ export const refresh = async (currToken:string) => {
         refreshToken: refreshToken
     }
 }
+
+// service layer to logout a user
+
+export const logout = async (currToken: string) => {
+    
+    const result = await revoke(currToken);
+    if (result==null){
+        throw new Error(`Could not revoke token`)
+    }
+    return result
+
+}

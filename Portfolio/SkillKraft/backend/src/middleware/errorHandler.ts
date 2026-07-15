@@ -2,24 +2,24 @@
 
 import type { NextFunction, Request, Response } from "express";
 
-type handlerError = {
+type ErrorResponse = {
     success: boolean,
     statusCode: number,
-    message: string,
-    details: string[]
+    message?: string,
+    details?: string[]
 }
 
-const globalErrorHandler = (error: handlerError, req: Request, res: Response, next: NextFunction) => {
+const globalErrorHandler = (error: ErrorResponse | Error | any, req: Request, res: Response, next: NextFunction) => {
     const statusCode: number = error.statusCode;
     switch (statusCode) {
         case 401:
-            return res.status(401).json({ success: false, message: "Check username and password", details: error.details });
+            return res.status(401).json({ success: false, message: "Check username or password", details: error.details });
         case 403:
             return res.status(403).json({success: false, message: "Unauthorised",details: error.details });
         case 400:
             return res.status(400).json({success: false, message: "Bad request", details: error.details });
         case 409:
-            return res.status(409).json({ suceess: false, message: "Conflict. Duplicate resource", details: error.details });
+            return res.status(409).json({ success: false, message: "Conflict. Duplicate resource", details: error.details });
         case 422:
             return res.status(422).json({ success: false, message: "Request failed validation parameters", details: error.details });
         case 404:
