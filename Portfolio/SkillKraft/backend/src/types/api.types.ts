@@ -6,9 +6,7 @@ export type NewUser = {
     passwordHash: string
 }
 
-
-
 export type UserDataForJWT = {
     userId: string,
-    email: string,
+    // email: string, // removed because auth.service.ts needs to generate new accessToken and email is not available in findByToken function
 }

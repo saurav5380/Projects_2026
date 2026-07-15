@@ -37,7 +37,7 @@ export const verifyToken = (token:string) => {
 }
     
 
-// refresh token - long expiry - 48 hours
+// refresh token - long expiry - 7 days
 export const signRefreshToken = (userData: UserDataForJWT) => {
     
     const SECRET_KEY = process.env.SECRET_KEY;
@@ -48,7 +48,7 @@ export const signRefreshToken = (userData: UserDataForJWT) => {
     
     const refershToken = jwt.sign(userData,SECRET_KEY,{
         algorithm: 'HS256',
-        expiresIn: '48h'
+        expiresIn: '7d'
     })
     
     return refershToken;

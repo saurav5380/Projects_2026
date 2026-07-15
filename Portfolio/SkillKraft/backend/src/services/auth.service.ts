@@ -1,26 +1,44 @@
 import { createNewUser, findByEmail } from "../repositories/user.repository.js"
 import type { NewUser } from "../types/api.types.js"
 import { hashPassword, verifyPassword } from "../utils/password.js"
+import { signAccessToken, signRefreshToken } from "../utils/jwt.js"
+import { findByToken, create, revoke } from "../repositories/refreshToken.repository.js"
+import type { UUID } from "node:crypto"
 
 // service layer for new user creation
-export const register = async (user: NewUser) => {
-    const newUser = await createNewUser(user)
+export const register = async (firstName:string, lastName:string, email: string, password: string) => {
+    const hashed = await hashPassword(password);
+    if (!hashed){
+        throw new Error ('password hashing failed')
+    }
+    const newUserData: NewUser = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        passwordHash: hashed
+    }
+    const newUser = await createNewUser(newUserData)
     if (!newUser){
         throw new Error (`Could not create user`)
     }
     return newUser;
 }
 
+//service layer for user login
 export const login = async (email: string, password: string) => {
     const user = await findByEmail(email);
     if (!user){
         throw new Error (`Invalid email or password`)
     }
-    const verified = verifyPassword(password, user?.passwordHash)
+    const verified = verifyPassword(password, user?.passwordHash);
     
     if (!verified){
         throw new Error (`Incorrect Password`)
     }
+    const id = String(user.id);
+    const userdata = {userId: id, email: email}
+    const accessToken = signAccessToken(userdata);
+    const refreshToken = signRefreshToken(userdata);
 
     const userPayload = {
         success: true,
@@ -32,9 +50,33 @@ export const login = async (email: string, password: string) => {
             email:user.email,
             onboardingDone: user.onboardingDone
             },
-            accessToken: "aaadas..",
-            refreshToken: "eyJ..."
+            accessToken: accessToken,
+            refreshToken: refreshToken
         }
     }
     return userPayload;
+}
+
+// service layer for refresh token
+export const refresh = async (currToken:string) => {
+    
+    // check if old refresh token is valid
+    const validToken = await findByToken(currToken);
+    
+    // generate new access token 
+    const userId = validToken.userId;
+    const accessToken = signAccessToken({userId});
+    
+    // generate new refresh token
+    const id = validToken.id as UUID;
+    const token = validToken.token;
+    const refreshToken = create(id,token);
+
+    // revoke old refresh token in DB
+    await revoke(token);
+
+    return {
+        accessToken: accessToken, 
+        refreshToken: refreshToken
+    }
 }

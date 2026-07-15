@@ -8,6 +8,7 @@ declare global {
                 firstName: string,
                 lastName: string,
                 email: string,
+                password: string,
                 currentRole: string,
                 targetRole: string,
                 weeklyHours: number,
