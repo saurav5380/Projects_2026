@@ -1,9 +1,8 @@
-import { createNewUser, findByEmail } from "../repositories/user.repository.js"
-import type { NewUser } from "../types/api.types.js"
-import { hashPassword, verifyPassword } from "../utils/password.js"
-import { signAccessToken, signRefreshToken } from "../utils/jwt.js"
-import { findByToken, create, revoke } from "../repositories/refreshToken.repository.js"
-import type { UUID } from "node:crypto"
+import { createNewUser, findByEmail } from "../repositories/user.repository.js";
+import type { NewUser } from "../types/api.types.js";
+import { hashPassword, verifyPassword } from "../utils/password.js";
+import { signAccessToken, signRefreshToken } from "../utils/jwt.js";
+import { findByToken, create, revoke } from "../repositories/refreshToken.repository.js";
 
 // service layer for new user creation
 export const register = async (firstName:string, lastName:string, email: string, password: string) => {
@@ -30,30 +29,32 @@ export const login = async (email: string, password: string) => {
     if (!user){
         throw new Error (`Invalid email or password`)
     }
-    const verified = verifyPassword(password, user?.passwordHash);
+    
+    const verified = await verifyPassword(password, user?.passwordHash);
     
     if (!verified){
         throw new Error (`Incorrect Password`)
     }
-    const id = String(user.id);
-    const userdata = {userId: id, email: email}
-    const accessToken = signAccessToken(userdata);
-    const refreshToken = signRefreshToken(userdata);
+    const userId = user.id;
+    const accessToken =  signAccessToken(userId);
+    const refreshToken = signRefreshToken(userId);
+    
 
     const userPayload = {
-        success: true,
-        data: {
-            user: {
+           user:
+           { 
             id: user.id,
             firstName: user.firstName,
             lastName: user.lastName,
             email:user.email,
             onboardingDone: user.onboardingDone
-            },
+           },
             accessToken: accessToken,
             refreshToken: refreshToken
-        }
     }
+    
+    await create(userId, refreshToken);
+
     return userPayload;
 }
 
@@ -62,18 +63,12 @@ export const refresh = async (currToken:string) => {
     
     // check if old refresh token is valid
     const validToken = await findByToken(currToken);
-    
-    // generate new access token 
     const userId = validToken.userId;
-    const accessToken = signAccessToken({userId});
-    
-    // generate new refresh token
-    const id = validToken.id as UUID;
-    const token = validToken.token;
-    const refreshToken = create(id,token);
+    const accessToken = signAccessToken(userId);
+    const refreshToken = signRefreshToken(userId);
 
-    // revoke old refresh token in DB
-    await revoke(token);
+    await create(userId, refreshToken);
+    await revoke(currToken);
 
     return {
         accessToken: accessToken, 

@@ -1,25 +1,20 @@
 
-import * as jwt from 'jsonwebtoken';
-import type { UserDataForJWT } from '../types/api.types.js';
-
+import jwt from 'jsonwebtoken';
 
 
 // access token - short lived - 15 mins
 
-export const signAccessToken = (userData: UserDataForJWT) => {
-        
+export const signAccessToken = (userId: string) => {
     const SECRET_KEY = process.env.SECRET_KEY;
 
     if (!SECRET_KEY){
-        throw new Error("Secret Key is missing")
+        throw new Error("SECRET_KEY is missing");
     }
 
-    const token = jwt.sign(userData, SECRET_KEY, {
+    return jwt.sign({ userId }, SECRET_KEY, {
         algorithm: 'HS256',
-        expiresIn: 900000
+        expiresIn: 900
     });
-         
-    return token;
 }
 
 //session management - check if user token is valid
@@ -38,25 +33,20 @@ export const verifyToken = (token:string) => {
     
 
 // refresh token - long expiry - 7 days
-export const signRefreshToken = (userData: UserDataForJWT) => {
-    
+export const signRefreshToken = (userId: string) => {
     const SECRET_KEY = process.env.SECRET_KEY;
     
     if(!SECRET_KEY){
-        throw new Error("Secret Key is missing")
+        throw new Error("SECRET_KEY is missing");
     }
     
-    const refershToken = jwt.sign(userData,SECRET_KEY,{
+    return jwt.sign({ userId }, SECRET_KEY, {
         algorithm: 'HS256',
         expiresIn: '7d'
-    })
-    
-    return refershToken;
-    
+    });
 }
     
     
     
-
 
 

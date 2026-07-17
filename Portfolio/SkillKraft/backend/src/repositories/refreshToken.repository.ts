@@ -1,13 +1,13 @@
 
 import prisma from "../db/prisma.js";
-import type { UUID } from "node:crypto";
+import HttpError from "../utils/httpError.js";
 
 // create refresh token - expires in 7 days
-export const create = async (id: UUID, token: string) => {
+export const create = async (userId: string, token: string) => {
 
         const result = await prisma.refreshToken.create({
         data: {
-            userId: id,
+            userId,
             token: token,
             expiresAt: new Date(Date.now() + 7*24*60*60*1000)
         },
@@ -24,13 +24,13 @@ export const create = async (id: UUID, token: string) => {
 export const findByToken = async(currToken: string) => {
     const tokenData = await prisma.refreshToken.findUnique({where: {token: currToken}});
     if ( tokenData === null){
-        throw new Error (`Token does not exist`)
+        throw new HttpError("Invalid refresh token", 401);
     }
     if (tokenData.revokedAt !== null){
-        throw new Error (`Invalid token. Token has been revoked at:${tokenData.revokedAt}`)
+        throw new HttpError("Invalid refresh token", 401);
     }
     if (tokenData.expiresAt < new Date()){
-        throw new Error ('Token Expired')
+        throw new HttpError("Refresh token has expired", 401);
     }
     return tokenData;
 };
@@ -49,5 +49,4 @@ export const revokeAllForUser = async(id: string) => {
     const tokenData = await prisma.refreshToken.deleteMany({where: {userId: id}});
     return tokenData.count;
 }
-
 

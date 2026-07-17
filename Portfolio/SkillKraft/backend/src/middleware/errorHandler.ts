@@ -1,6 +1,7 @@
 // import type {Response} from 'express';
 
 import type { NextFunction, Request, Response } from "express";
+import HttpError from "../utils/httpError.js";
 
 type ErrorResponse = {
     success: boolean,
@@ -10,10 +11,10 @@ type ErrorResponse = {
 }
 
 const globalErrorHandler = (error: ErrorResponse | Error | any, req: Request, res: Response, next: NextFunction) => {
-    const statusCode: number = error.statusCode;
+    const statusCode = error instanceof HttpError ? error.statusCode : 500;
     switch (statusCode) {
         case 401:
-            return res.status(401).json({ success: false, message: "Check username or password", details: error.details });
+            return res.status(401).json({ success: false, message: error.message ?? "Unauthorized", details: error.details });
         case 403:
             return res.status(403).json({success: false, message: "Unauthorised",details: error.details });
         case 400:

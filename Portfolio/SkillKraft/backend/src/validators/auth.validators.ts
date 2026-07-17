@@ -14,5 +14,5 @@ export const LoginBody = z.object({
 })
 
 export const RefreshBody = z.object({
-    refreshToken: z.string()
+    currToken: z.string()
 })
