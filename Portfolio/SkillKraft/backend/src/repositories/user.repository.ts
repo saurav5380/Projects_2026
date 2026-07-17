@@ -1,7 +1,7 @@
 // this file contains all logic which touches the DB using Prisma ORM
 
 import prisma from "../db/prisma.js";
-import type { NewUser } from "../types/api.types.js";
+import type { NewUser, UserProfileUpdate, UpdatePassword } from "../types/api.types.js";
 
 export const createNewUser = async (user: NewUser) => {
 
@@ -40,5 +40,40 @@ export const findById = async (userId: string) => {
     return result
 };
 
+export const updateProfile = async(userData: UserProfileUpdate) =>{
+    const result = await prisma.user.update({
+        where: {
+            id: userData.userId
+        },
+        data:{
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            currentRole: userData.currentRole,
+            targetRole: userData.targetRole,
+            weeklyHours: userData.weeklyHours,
+            targetMonths: userData.targetMonths
+        }
+    });
+    if (!result){
+        return null
+    }
+    return result
+};
+
+export const updatePassword = async(passwordInfo:UpdatePassword) => {
+    const userId = passwordInfo.userId;
+    const result = await prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            passwordHash: passwordInfo.newPasswordHash
+        }
+    })
+    if(!result){
+        return null
+    }
+    return result
+}
 
 

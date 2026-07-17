@@ -6,7 +6,18 @@ export type NewUser = {
     passwordHash: string
 }
 
-export type UserDataForJWT = {
+export type UserProfileUpdate = {
     userId: string,
-    // email: string, // removed because auth.service.ts needs to generate new accessToken and email is not available in findByToken function
+    firstName: string,
+    lastName: string,
+    currentRole: string,
+    targetRole: string,
+    weeklyHours: number,
+    targetMonths: number
+}
+
+export type UpdatePassword = {
+    userId: string,
+    currentPasswordHash: string,
+    newPasswordHash: string
 }
