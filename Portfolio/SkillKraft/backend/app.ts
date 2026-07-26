@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import type { Request, Response } from 'express';
 import globalErrorHandler from "../backend/src/middleware/errorHandler.js";
 import authRouter from './src/routes/auth.routes.js';
+import userRouter from './src/routes/user.routes.js';
 
 
 dotenv.config();
@@ -18,6 +19,8 @@ app.get("/", (req: Request, res: Response) => {
 })
 
 app.use("/auth", authRouter);
+
+app.use("/user", userRouter);
 
 app.use(globalErrorHandler);
 

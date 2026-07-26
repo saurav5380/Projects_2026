@@ -1,8 +1,8 @@
-import type {Request, Response} from 'express'
+import type {NextFunction, Request, Response} from 'express'
 import jwt from 'jsonwebtoken'
 
 
-const authenticate = (req: Request, res: Response) => {
+const authenticate = (req: Request, res: Response, next: NextFunction ) => {
     try{
         const SECRET_KEY = process.env.SECRET_KEY;
         if (!SECRET_KEY){
@@ -22,10 +22,13 @@ const authenticate = (req: Request, res: Response) => {
         }
 
         const payload = jwt.verify(token, SECRET_KEY);
-        res.status(200).json({
-            data: payload
-        })
+        if (typeof payload === 'string' || !('userId' in payload)) {
+            return res.status(401).json({ message: 'Invalid token payload' });
+        }
+        const userId = payload.userId as string;
 
+        req.user = { id: userId }
+        next()
     }
     catch(error){
         if (error instanceof Error){
