@@ -6,7 +6,7 @@ const BASE_URL = "http://localhost:3002"
 
 // creates an axios instance
 const apiClient: AxiosInstance = axios.create({
-    baseURL: "http://localhost:3002",
+    baseURL: BASE_URL,
     headers: {
         "Content-Type": "application/json"
     }
@@ -48,7 +48,7 @@ apiClient.interceptors.response.use((response) => {
 
                 // prevent retry
                 originalRequest.headers["X-Retry"] = true;
-                originalRequest.headers.Authorization = `Bearer ${response.data.data.refreshToken}`
+                originalRequest.headers.Authorization = `Bearer ${response.data.data.accessToken}`
 
                 return apiClient(originalRequest)
             }
@@ -65,7 +65,7 @@ apiClient.interceptors.response.use((response) => {
 })
 
 
-export const apiRequest = {
+const apiRequest = {
     get: async <T>(url: string, config = {}) => {
         const response = await apiClient.get<T>(url, config)
         return response.data;
@@ -83,3 +83,5 @@ export const apiRequest = {
         return response.data;
     }
 }
+
+export default apiRequest;
