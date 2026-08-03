@@ -50,6 +50,7 @@ export const useAuth = () => {
             authHelpers.clearAccessToken();
             authHelpers.clearRefreshToken();
             console.log("User logged out at: ", data.data);
+            router.push("/auth/login")
         },
         onError: (error) => {
             console.error("Error logging out user", error.message);
@@ -60,13 +61,15 @@ export const useAuth = () => {
     return {
         register: registerMutation.mutate,
         registerError: registerMutation.error,
-        isRegistering: registerMutation.isPending,
+        registerIsPending: registerMutation.isPending,
         
         login: loginMutation.mutate,
         loginError: loginMutation.error,
-        isLogging: loginMutation.isPending,
+        loginIsPending: loginMutation.isPending,
 
-        logout: logoutMutation.mutate
+        logout: logoutMutation.mutate,
+        logoutError: logoutMutation.error,
+        LogoutIsPending: logoutMutation.isPending
     }
     
 }
