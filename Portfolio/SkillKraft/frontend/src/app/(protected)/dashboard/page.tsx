@@ -2,7 +2,7 @@
 const Dashboard = () => {
     return (
         <>
-        <h1>Welcome to SkillKraft-DashBoard</h1>
+        <h1>Welcome to Your DashBoard</h1>
         </>
     )
 }

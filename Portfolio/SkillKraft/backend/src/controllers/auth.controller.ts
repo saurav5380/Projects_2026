@@ -58,6 +58,7 @@ export const loginController = async (req:Request, res:Response, next: NextFunct
             success: true,
             data: result
         })
+        console.log(result);
     }
     catch(error){
         next(error)

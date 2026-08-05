@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import * as authHelpers from "../lib/auth.js";
+import * as authHelpers from "@/lib/auth";
 
 const BASE_URL = "http://localhost:3002"
 

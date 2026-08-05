@@ -16,6 +16,7 @@ export const useAuth = () => {
             return response;
         },
         onSuccess:(data) => {
+            router.push("/login");
             console.log("Registered user:", data.data);
         },
         onError: (error) => {
@@ -35,7 +36,7 @@ export const useAuth = () => {
             console.log("User Login Success: ", data.data)
             authHelpers.setAccessToken(data.data.accessToken);
             authHelpers.setRefreshToken(data.data.refreshToken);
-
+            router.push("/dashboard")
         },
         onError: (error) => {
             console.error("Login failed: ", error.message)
@@ -66,6 +67,7 @@ export const useAuth = () => {
             return response;
         },
         onSuccess: (data) => {
+            
             console.log("Current User details: ", data.data)
         },
         onError: (error) => {
