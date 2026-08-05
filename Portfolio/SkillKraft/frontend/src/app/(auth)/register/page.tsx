@@ -40,7 +40,8 @@ const Register = () => {
             <input {...registerField('password')}/>
             {errors.password && <p>{errors.password.message}</p>}
 
-
+            <button type='submit' disabled={registerIsPending}>{registerIsPending ? "Registering..." : "Register"}</button>
+            {registerError && <p>registerError.message</p>}
         </form>
         </>
     )
