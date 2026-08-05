@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import type { UserRegistryData, RegisterResponse, UserLoginData, LoginResponse, LogoutResponse } from "../types/api.types";
+import type { UserRegistryData, RegisterResponse, UserLoginData, LoginResponse, LogoutResponse, UserDetails } from "../types/api.types";
 import apiRequest from "@/lib/apiClient";
 import { useRouter } from 'next/navigation';
 import * as authHelpers from "@/lib/auth"
+// import { refresh } from "next/cache";
 
 export const useAuth = () => {
     const router = useRouter();
@@ -41,9 +42,11 @@ export const useAuth = () => {
         }
     });
 
+    // Logout Mutation
+
     const logoutMutation = useMutation({
         mutationFn: async(refreshToken: string) => {
-            const response = await apiRequest.post<LogoutResponse>("/auth/logout", refreshToken);
+            const response = await apiRequest.post<LogoutResponse>("/auth/logout", {refreshToken});
             return response;
         },
         onSuccess: (data) => {
@@ -54,6 +57,19 @@ export const useAuth = () => {
         },
         onError: (error) => {
             console.error("Error logging out user", error.message);
+        }
+    });
+
+    const useCurrentUser = useMutation ({
+        mutationFn: async(userId: string) => {
+            const response = await apiRequest.get<UserDetails>(`/me/${userId}`);
+            return response;
+        },
+        onSuccess: (data) => {
+            console.log("Current User details: ", data.data)
+        },
+        onError: (error) => {
+            console.error("Error fetching user data: ", error.message);
         }
     })
 
@@ -69,7 +85,11 @@ export const useAuth = () => {
 
         logout: logoutMutation.mutate,
         logoutError: logoutMutation.error,
-        LogoutIsPending: logoutMutation.isPending
+        LogoutIsPending: logoutMutation.isPending,
+
+        currentUser: useCurrentUser.mutate,
+        currentUserError: useCurrentUser.error,
+        currentUserDataIsPending: useCurrentUser.isPending
     }
     
 }

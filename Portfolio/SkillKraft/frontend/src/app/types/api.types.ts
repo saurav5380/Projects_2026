@@ -35,3 +35,22 @@ export type LogoutResponse = {
     }
 }
 
+export type UserDetails = {
+    success: boolean,
+    data: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    id: string;
+    passwordHash: string;
+    currentRole: string | null;
+    targetRole: string | null;
+    weeklyHours: number | null;
+    targetMonths: number | null;
+    onboardingDone: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+}
+}
+
+
