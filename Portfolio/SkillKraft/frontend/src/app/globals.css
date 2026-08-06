@@ -2,7 +2,7 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-@custom-variant dark (&:is(.dark *));
+/* @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
@@ -115,6 +115,217 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+} */
+
+/* frontend/app/globals.css */
+
+/* ── 1. TAILWIND v4 ENTRY POINT ── */
+/* @import "tailwindcss"; */
+
+/* ── 2. GOOGLE FONTS ── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ── 3. DESIGN TOKENS + TAILWIND THEME ── */
+/*
+  The @theme block replaces tailwind.config.ts entirely.
+  Every token defined here generates a corresponding Tailwind utility class.
+  Naming: --color-bg-surface → bg-bg-surface, text-bg-surface, border-bg-surface
+          --font-sans        → font-sans
+          --radius-lg        → rounded-lg
+*/
+@theme {
+
+  /* FONT FAMILIES */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+
+  /* BORDER RADIUS */
+  --radius-xs:  4px;
+  --radius-sm:  6px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 24px;
+
+  /* ── DARK MODE COLOURS (default — applied in :root below) ── */
+  /* Backgrounds */
+  --color-bg-base:        #0E1825;  /* Deep sea-ink navy — page background */
+  --color-bg-surface:     #162130;  /* Card backgrounds */
+  --color-bg-surface-2:   #1D2D40;  /* Elevated surfaces — modals, hover */
+  --color-bg-subtle:      #243650;  /* Inset areas — inputs, code blocks */
+
+  /* Borders */
+  --color-border:         #2D4560;  /* Primary borders */
+  --color-border-soft:    #1D2D40;  /* Subtle internal dividers */
+
+  /* Text */
+  --color-text-primary:   #EDF2F7;  /* Headings, important labels */
+  --color-text-secondary: #8BA4BC;  /* Body copy, descriptions */
+  --color-text-muted:     #4A6580;  /* Timestamps, captions, placeholders */
+
+  /* Brand — amber compass needle */
+  --color-brand:          #F0A500;
+  --color-brand-soft:     #3D2A00;
+  --color-brand-border:   #7A5200;
+
+  /* Semantic — success, warning, danger, info */
+  --color-success:        #34D399;
+  --color-success-soft:   #052E1A;
+  --color-warning:        #FBBF24;
+  --color-warning-soft:   #2D1F00;
+  --color-danger:         #F87171;
+  --color-danger-soft:    #2D0A0A;
+  --color-info:           #60A5FA;
+  --color-info-soft:      #0A1929;
+}
+
+/* ── 4. SHADCN v4 INTEGRATION ── */
+/*
+  ShadCN for Tailwind v4 uses @theme inline to map its internal variable
+  names to SkillKraft's design tokens. This ensures every ShadCN component
+  (Button, Input, Badge, Dialog, Sheet, etc.) uses SkillKraft colours
+  automatically — no per-component overrides needed.
+
+  After running `npx shadcn@latest init`, this block replaces the default
+  ShadCN @theme inline block that the CLI generates.
+
+  Note: ShadCN v4 accepts hex values directly — no HSL conversion needed.
+*/
+@theme inline {
+  /* Core surfaces */
+  --color-background:             var(--color-bg-base);
+  --color-foreground:             var(--color-text-primary);
+  --color-card:                   var(--color-bg-surface);
+  --color-card-foreground:        var(--color-text-primary);
+  --color-popover:                var(--color-bg-surface-2);
+  --color-popover-foreground:     var(--color-text-primary);
+
+  /* Primary = brand amber */
+  --color-primary:                var(--color-brand);
+  --color-primary-foreground:     #0E1825;  /* always dark text on amber */
+
+  /* Secondary = subtle background */
+  --color-secondary:              var(--color-bg-subtle);
+  --color-secondary-foreground:   var(--color-text-primary);
+
+  /* Muted = very subtle, for placeholders */
+  --color-muted:                  var(--color-bg-subtle);
+  --color-muted-foreground:       var(--color-text-muted);
+
+  /* Accent = brand-soft amber wash */
+  --color-accent:                 var(--color-brand-soft);
+  --color-accent-foreground:      var(--color-brand);
+
+  /* Destructive = danger */
+  --color-destructive:            var(--color-danger);
+  --color-destructive-foreground: #0E1825;
+
+  /* Borders, inputs, focus rings */
+  --color-border:                 var(--color-border);
+  --color-input:                  var(--color-bg-subtle);
+  --color-ring:                   var(--color-brand);
+
+  /* Sidebar (used by ShadCN sidebar components) */
+  --color-sidebar:                var(--color-bg-surface);
+  --color-sidebar-foreground:     var(--color-text-primary);
+  --color-sidebar-primary:        var(--color-brand);
+  --color-sidebar-primary-foreground: #0E1825;
+  --color-sidebar-accent:         var(--color-bg-subtle);
+  --color-sidebar-accent-foreground: var(--color-text-secondary);
+  --color-sidebar-border:         var(--color-border);
+  --color-sidebar-ring:           var(--color-brand);
+
+  /* Radius — ShadCN uses --radius as its base */
+  --radius: 0.5rem;  /* 8px — maps to rounded-md, SkillKraft's default */
+}
+
+/* ── 5. DARK MODE DEFAULTS ── */
+/*
+  These are the live CSS variable values for dark mode (default).
+  @theme above registers the token names with Tailwind for class generation.
+  :root provides the actual values at runtime.
+  Both are needed — @theme for build-time class generation,
+  :root for run-time variable resolution.
+*/
+:root {
+  --color-bg-base:        #0E1825;
+  --color-bg-surface:     #162130;
+  --color-bg-surface-2:   #1D2D40;
+  --color-bg-subtle:      #243650;
+  --color-border:         #2D4560;
+  --color-border-soft:    #1D2D40;
+  --color-text-primary:   #EDF2F7;
+  --color-text-secondary: #8BA4BC;
+  --color-text-muted:     #4A6580;
+  --color-brand:          #F0A500;
+  --color-brand-soft:     #3D2A00;
+  --color-brand-border:   #7A5200;
+  --color-success:        #34D399;
+  --color-success-soft:   #052E1A;
+  --color-warning:        #FBBF24;
+  --color-warning-soft:   #2D1F00;
+  --color-danger:         #F87171;
+  --color-danger-soft:    #2D0A0A;
+  --color-info:           #60A5FA;
+  --color-info-soft:      #0A1929;
+}
+
+/* ── 6. LIGHT MODE OVERRIDES ── */
+/*
+  Applied when <html class="light"> is toggled by the theme switch in Topbar.
+  Only the colour values change — no class names change in any component.
+*/
+.light {
+  --color-bg-base:        #F5F0E8;  /* Warm off-white paper */
+  --color-bg-surface:     #FFFFFF;  /* Pure white cards */
+  --color-bg-surface-2:   #F0EBE0;
+  --color-bg-subtle:      #E8E0D0;
+  --color-border:         #D4C8B8;
+  --color-border-soft:    #E8E0D0;
+  --color-text-primary:   #0E1825;  /* Same ink as dark mode base */
+  --color-text-secondary: #4A6580;
+  --color-text-muted:     #8BA4BC;
+  --color-brand:          #B07800;  /* Amber darkened for white background contrast */
+  --color-brand-soft:     #FFF3D6;
+  --color-brand-border:   #F0A500;
+  --color-success:        #059669;
+  --color-success-soft:   #D1FAE5;
+  --color-warning:        #D97706;
+  --color-warning-soft:   #FEF3C7;
+  --color-danger:         #DC2626;
+  --color-danger-soft:    #FEE2E2;
+  --color-info:           #2563EB;
+  --color-info-soft:      #DBEAFE;
+}
+
+/* ── 7. BASE STYLES ── */
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── 8. SCROLLBAR ── */
+::-webkit-scrollbar       { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-base); }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+  transition: background 150ms ease;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-muted); }
+
+/* ── 9. REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration:  0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 @layer base {
