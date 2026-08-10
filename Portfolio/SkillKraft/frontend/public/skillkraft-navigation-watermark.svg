@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000" fill="none">
+  <title>SkillKraft Career Navigation Watermark</title>
+  <desc>Transparent vector compass and career learning roadmap watermark.</desc>
+
+  <!-- No background element: the SVG is fully transparent. -->
+
+  <g stroke="#2D4560" fill="none" opacity="0.30">
+    <circle cx="500" cy="500" r="390" stroke-width="2"/>
+    <circle cx="500" cy="500" r="285" stroke-width="2" stroke-dasharray="10 12"/>
+    <circle cx="500" cy="500" r="180" stroke-width="2"/>
+    <circle cx="500" cy="500" r="92" stroke-width="2" stroke-dasharray="7 10"/>
+  </g>
+
+  <!-- Compass crosshair -->
+  <g stroke="#2D4560" opacity="0.28" stroke-width="2">
+    <path d="M500 75V925"/>
+    <path d="M75 500H925"/>
+    <path d="M198 198L802 802"/>
+    <path d="M802 198L198 802"/>
+  </g>
+
+  <!-- Compass ticks -->
+  <g stroke="#2D4560" opacity="0.34" stroke-width="3">
+    <path d="M500 52V90"/>
+    <path d="M500 910V948"/>
+    <path d="M52 500H90"/>
+    <path d="M910 500H948"/>
+    <path d="M181 181L208 208"/>
+    <path d="M792 792L819 819"/>
+    <path d="M819 181L792 208"/>
+    <path d="M208 792L181 819"/>
+  </g>
+
+  <!-- Subtle compass rose -->
+  <g stroke="#EDF2F7" stroke-width="2" opacity="0.18">
+    <path d="M500 250L525 475L750 500L525 525L500 750L475 525L250 500L475 475Z"/>
+    <path d="M500 315L515 485L685 500L515 515L500 685L485 515L315 500L485 485Z"/>
+  </g>
+
+  <!-- Career learning route -->
+  <path d="M105 790
+           C190 730 255 685 330 635
+           C410 582 470 540 555 492
+           C635 446 710 390 780 320
+           C820 280 850 235 875 185"
+        stroke="#EDF2F7"
+        stroke-width="7"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        opacity="0.72"/>
+
+  <!-- Completed milestones -->
+  <g fill="#EDF2F7">
+    <circle cx="105" cy="790" r="19" opacity="0.90"/>
+    <circle cx="255" cy="685" r="19" opacity="0.82"/>
+    <circle cx="410" cy="582" r="19" opacity="0.70"/>
+  </g>
+
+  <!-- Upcoming milestones -->
+  <g stroke="#EDF2F7" stroke-width="6" fill="#0E1825">
+    <circle cx="555" cy="492" r="20" opacity="0.82"/>
+    <circle cx="710" cy="390" r="20" opacity="0.78"/>
+    <circle cx="820" cy="280" r="20" opacity="0.82"/>
+  </g>
+
+  <!-- Leading waypoint: the only amber element -->
+  <circle cx="875" cy="185" r="25" stroke="#EDF2F7" stroke-width="5" opacity="0.95"/>
+  <circle cx="875" cy="185" r="14" fill="#F0A500"/>
+
+  <!-- Directional arrow -->
+  <path d="M875 185L925 130L903 195L875 185Z" fill="#F0A500"/>
+
+  <!-- Small route continuation accent -->
+  <path d="M875 185L925 130" stroke="#F0A500" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1000" height="1000" viewBox="0 0 1000 1000" fill="none">
+  <title>SkillKraft Minimal Navigation Watermark</title>
+  <desc>Transparent compass navigation watermark with no route, nodes, or destination arrow.</desc>
+
+  <!-- Intentionally no background element: fully transparent. -->
+
+  <!-- Outer navigation rings -->
+  <g stroke="#2D4560" fill="none">
+    <circle cx="500" cy="500" r="430" stroke-width="2" opacity="0.30"/>
+    <circle cx="500" cy="500" r="320" stroke-width="2"
+            stroke-dasharray="11 13" opacity="0.34"/>
+    <circle cx="500" cy="500" r="230" stroke-width="2" opacity="0.30"/>
+    <circle cx="500" cy="500" r="135" stroke-width="2"
+            stroke-dasharray="8 11" opacity="0.26"/>
+  </g>
+
+  <!-- Crosshair and navigation guides -->
+  <g stroke="#EDF2F7" fill="none" stroke-width="2" opacity="0.24">
+    <path d="M500 55V945" stroke-dasharray="13 12"/>
+    <path d="M55 500H945" stroke-dasharray="13 12"/>
+    <path d="M185 185L815 815" stroke-dasharray="13 12"/>
+    <path d="M815 185L185 815" stroke-dasharray="13 12"/>
+  </g>
+
+  <!-- Perimeter ticks -->
+  <g stroke="#2D4560" stroke-width="3" opacity="0.38">
+    <path d="M500 45V85"/>
+    <path d="M500 915V955"/>
+    <path d="M45 500H85"/>
+    <path d="M915 500H955"/>
+    <path d="M176 176L204 204"/>
+    <path d="M796 796L824 824"/>
+    <path d="M824 176L796 204"/>
+    <path d="M204 796L176 824"/>
+  </g>
+
+  <!-- Minimal compass rose -->
+  <g stroke="#EDF2F7" fill="none" stroke-width="2" opacity="0.22">
+    <path d="M500 265L525 475L735 500L525 525L500 735L475 525L265 500L475 475Z"/>
+    <path d="M500 330L514 486L670 500L514 514L500 670L486 514L330 500L486 486Z"/>
+  </g>
+</svg>

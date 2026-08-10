@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -119,12 +120,6 @@
 
 /* frontend/app/globals.css */
 
-/* ── 1. TAILWIND v4 ENTRY POINT ── */
-/* @import "tailwindcss"; */
-
-/* ── 2. GOOGLE FONTS ── */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 /* ── 3. DESIGN TOKENS + TAILWIND THEME ── */
 /*
   The @theme block replaces tailwind.config.ts entirely.
@@ -167,6 +162,11 @@
   --color-brand:          #F0A500;
   --color-brand-soft:     #3D2A00;
   --color-brand-border:   #7A5200;
+
+  /* Focus ring — deliberately NOT amber.
+     A soft cool off-white that reads as "focused" without competing
+     with the brand accent. Used on all inputs, selects, and focusable elements. */
+  --color-focus-ring:     #C8D8E8;  /* cool off-white, dark mode */
 
   /* Semantic — success, warning, danger, info */
   --color-success:        #34D399;
@@ -223,7 +223,7 @@
   /* Borders, inputs, focus rings */
   --color-border:                 var(--color-border);
   --color-input:                  var(--color-bg-subtle);
-  --color-ring:                   var(--color-brand);
+  --color-ring:                   var(--color-focus-ring);  /* off-white, NOT amber — see amber usage rules */
 
   /* Sidebar (used by ShadCN sidebar components) */
   --color-sidebar:                var(--color-bg-surface);
@@ -233,7 +233,7 @@
   --color-sidebar-accent:         var(--color-bg-subtle);
   --color-sidebar-accent-foreground: var(--color-text-secondary);
   --color-sidebar-border:         var(--color-border);
-  --color-sidebar-ring:           var(--color-brand);
+  --color-sidebar-ring:           var(--color-focus-ring);  /* off-white, NOT amber */
 
   /* Radius — ShadCN uses --radius as its base */
   --radius: 0.5rem;  /* 8px — maps to rounded-md, SkillKraft's default */
@@ -260,6 +260,7 @@
   --color-brand:          #F0A500;
   --color-brand-soft:     #3D2A00;
   --color-brand-border:   #7A5200;
+  --color-focus-ring:     #C8D8E8;  /* cool off-white focus ring — dark mode */
   --color-success:        #34D399;
   --color-success-soft:   #052E1A;
   --color-warning:        #FBBF24;
@@ -288,6 +289,7 @@
   --color-brand:          #B07800;  /* Amber darkened for white background contrast */
   --color-brand-soft:     #FFF3D6;
   --color-brand-border:   #F0A500;
+  --color-focus-ring:     #4A6580;  /* muted blue-grey focus ring — light mode */
   --color-success:        #059669;
   --color-success-soft:   #D1FAE5;
   --color-warning:        #D97706;
@@ -328,7 +330,8 @@ body {
   }
 }
 
-@layer base {
+
+/* @layer base {
   * {
     @apply border-border outline-ring/50;
   }
@@ -338,5 +341,5 @@ body {
   html {
     @apply font-sans;
   }
-}
+} */
 
