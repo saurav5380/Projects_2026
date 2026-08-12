@@ -1,8 +1,9 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { UserRegistryData, RegisterResponse, UserLoginData, LoginResponse, LogoutResponse, UserDetails } from "../types/api.types";
 import apiRequest from "@/lib/apiClient";
 import { useRouter } from 'next/navigation';
 import * as authHelpers from "@/lib/auth"
+
 // import { refresh } from "next/cache";
 
 export const useAuth = () => {
@@ -61,18 +62,10 @@ export const useAuth = () => {
         }
     });
 
-    const useCurrentUser = useMutation ({
-        mutationFn: async(userId: string) => {
-            const response = await apiRequest.get<UserDetails>(`/me/${userId}`);
-            return response;
-        },
-        onSuccess: (data) => {
-            
-            console.log("Current User details: ", data.data)
-        },
-        onError: (error) => {
-            console.error("Error fetching user data: ", error.message);
-        }
+    // Get current user
+    const {data:currentUser, error: currentUserError, isPending: currentUserDataIsPending} = useQuery<UserDetails>({
+        queryKey: ['user', 'me'],
+        queryFn: () => apiRequest.get('/users/me')
     })
 
 
@@ -89,9 +82,9 @@ export const useAuth = () => {
         logoutError: logoutMutation.error,
         LogoutIsPending: logoutMutation.isPending,
 
-        currentUser: useCurrentUser.mutate,
-        currentUserError: useCurrentUser.error,
-        currentUserDataIsPending: useCurrentUser.isPending
+        currentUser,
+        currentUserError,
+        currentUserDataIsPending
     }
     
 }
