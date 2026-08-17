@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <title>SkillKraft Growth Steps Icon</title>
+  <desc>Amber geometric growth steps symbol on a transparent background.</desc>
+
+  <!-- No background element: the SVG is fully transparent. -->
+
+  <path d="M92 388V304C92 292.95 100.95 284 112 284H124C135.05 284 144 292.95 144 304V368H144V388H92Z"
+        fill="#F0A500"/>
+
+  <path d="M172 388V244C172 232.95 180.95 224 192 224H204C215.05 224 224 232.95 224 244V368H224V388H172Z"
+        fill="#F0A500"/>
+
+  <path d="M252 388V184C252 172.95 260.95 164 272 164H336C347.05 164 356 172.95 356 184V388H252Z"
+        fill="#F0A500"/>
+
+  <circle cx="336" cy="112" r="28" fill="#F0A500"/>
+</svg>

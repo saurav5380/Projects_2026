@@ -48,14 +48,14 @@ export const useAuth = () => {
 
     const logoutMutation = useMutation({
         mutationFn: async(refreshToken: string) => {
-            const response = await apiRequest.post<LogoutResponse>("/auth/logout", {refreshToken});
+            const response = await apiRequest.post<LogoutResponse>("/auth/logout", {currToken: refreshToken});
             return response;
         },
         onSuccess: (data) => {
             authHelpers.clearAccessToken();
             authHelpers.clearRefreshToken();
             console.log("User logged out at: ", data.data);
-            router.push("/auth/login")
+            router.push("/login")
         },
         onError: (error) => {
             console.error("Error logging out user", error.message);
@@ -65,7 +65,8 @@ export const useAuth = () => {
     // Get current user
     const {data:currentUser, error: currentUserError, isPending: currentUserDataIsPending} = useQuery<UserDetails>({
         queryKey: ['user', 'me'],
-        queryFn: () => apiRequest.get('/users/me')
+        queryFn: () => apiRequest.get('/user/me'),
+        enabled: !!authHelpers.getAccessToken()
     })
 
 

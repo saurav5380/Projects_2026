@@ -36,8 +36,6 @@ export type LogoutResponse = {
 }
 
 export type UserDetails = {
-    success: boolean,
-    data: {
     email: string;
     firstName: string;
     lastName: string;
@@ -51,6 +49,9 @@ export type UserDetails = {
     createdAt: Date;
     updatedAt: Date;
 }
-}
 
 
+export type PageHeaderProps = {
+    title: string;
+    subtitle?: string;
+};

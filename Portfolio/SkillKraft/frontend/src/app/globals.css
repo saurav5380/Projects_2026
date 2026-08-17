@@ -325,13 +325,13 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition-duration: 0.01ms !important;
-    animation-duration:  0.01ms !important;
-    animation-iteration-count: 1 !important;
+    /* animation-duration:  0.01ms !important; */
+    /* animation-iteration-count: 1 !important; */
   }
 }
 
 
-/* @layer base {
+@layer base {
   * {
     @apply border-border outline-ring/50;
   }
@@ -341,5 +341,5 @@ body {
   html {
     @apply font-sans;
   }
-} */
+}
 

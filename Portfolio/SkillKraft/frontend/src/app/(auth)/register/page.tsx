@@ -30,7 +30,10 @@ const Register = () => {
 
     const { register, registerError, registerIsPending } = useAuth();
 
-    const { control, handleSubmit } = useForm<RegisterFormData>({ resolver: zodResolver(registerSchema) });
+    const { control, handleSubmit } = useForm<RegisterFormData>({
+        resolver: zodResolver(registerSchema),
+        defaultValues: { firstName: "", lastName: "", email: "", password: "" }
+    });
 
     const onFormSubmit = (data: RegisterFormData) => {
         register(data);
@@ -39,9 +42,9 @@ const Register = () => {
     return (
         // Design System §2 — page background token; §4.3 — centred layout for auth pages
         <div className="relative h-dvh overflow-hidden bg-bg-base flex p-4 ">
-            <div className=" min-h-screen bg-bg-base w-[35vw] border-border-soft">
-            <Image src={"/SkillKraft_Logo.svg"} alt='skillkraft logo' width={512} height={512} className=''/>     
-            <Image src={"/skillkraft-minimal-navigation-watermark.svg"} alt='skillkraft compass image' fill className='object-contain object-left opacity-10 pointer-events-none'/>     
+            <div className="relative min-h-screen bg-bg-base w-[35vw] border-border-soft">
+            <Image src={"/skillkraft-growth-steps-transparent.svg"} alt='skillkraft logo' width={128} height={128}/>
+            <Image src={"/skillkraft-minimal-navigation-watermark.svg"} alt='skillkraft compass image' fill className='object-contain object-left opacity-10 pointer-events-none'/>
             </div>
             {/* Design System §5.1 Default card — bg-bg-surface, border-border, rounded-lg, p-6 */}
             <div className="min-h-screen bg-bg-base p-4 flex justify-center items-center w-full">

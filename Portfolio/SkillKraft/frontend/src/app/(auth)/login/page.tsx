@@ -24,7 +24,10 @@ const Login = () => {
     
     const { login, loginError, loginIsPending } = useAuth();
     
-    const {register, handleSubmit, control, formState: {errors} } = useForm<LoginFormData>({resolver: zodResolver(loginSchema)});
+    const { handleSubmit, control } = useForm<LoginFormData>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: { email: "", password: "" }
+    });
 
     const formSubmit = (data: LoginFormData) => {
         login(data);
@@ -35,12 +38,13 @@ const Login = () => {
 
     return (
         <>
-       <div className="relative h-dvh overflow-hidden bg-bg-base flex items-center p-4 ">
-        <div className=" min-h-screen bg-bg-base w-[35vw] border-border-soft">
-        <Image src={"/SkillKraft_Logo.svg"} alt='skillkraft logo' width={512} height={512} className=''/>     
-        <Image src={"/skillkraft-minimal-navigation-watermark.svg"} alt='skillkraft compass image' fill className='object-contain object-left opacity-10 pointer-events-none'/>     
+       <div className="relative h-dvh overflow-hidden bg-bg-base flex items-center justify-start p-4 ">
+        <div className="relative min-h-screen bg-bg-base w-[35vw] border-border-soft">
+        <Image src={"/skillkraft-growth-steps-transparent.svg"} alt='skillkraft logo' loading='eager' width={128} height={128}/>     
+        <Image src={"/skillkraft-minimal-navigation-watermark.svg"} alt='skillkraft compass image' loading='eager' fill className='object-contain object-left opacity-10 pointer-events-none'/>     
+        <h1 className="text-primary text-xl font-bold px-4">SkillKraft</h1>
         </div>
-        <Card className="w-full max-w-md max-h-72  bg-bg-surface border-border rounded-lg p-6">
+        <Card className="w-full max-w-md max-h-lg  bg-bg-surface border-border rounded-lg p-6">
             <CardHeader>
                 <CardTitle className="text-2xl font-bold tracking-tight font-sans text-text-primary text-center">
                     Login to SkillKraft

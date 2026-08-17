@@ -8,7 +8,7 @@ import { redirect }  from 'next/navigation';
 const AuthGuard = ({children}: {children: React.ReactNode}) => {
     const token = authHelpers.getAccessToken();
     if (!token){
-        redirect("/auth/login");
+        redirect("/login");
     }
     return (
         <>
