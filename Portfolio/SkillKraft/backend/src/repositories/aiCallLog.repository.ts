@@ -1,8 +1,10 @@
 import prisma from "../db/prisma.js";
 import { AIProvider } from "../../src/generated/prisma/enums.js"
+import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
 
 export const aiLog = async (id: string, featureName: string, provider: AIProvider, model: string = "", latencyMs: number, success: boolean, usedFallback: boolean) => {
-    const result = await prisma.aICallLog.create({
+    try{
+        const result = await prisma.aICallLog.create({
         data: {
             userId: id,
             featureName,
@@ -13,7 +15,16 @@ export const aiLog = async (id: string, featureName: string, provider: AIProvide
             usedFallback
         }
     })
-    return result;
+        return result;
+    }
+    catch(error){
+        if (error instanceof PrismaClientKnownRequestError){
+            console.error("Could not write log: ", error.message)
+        }
+        else{
+            throw new Error("Error writing log")
+        }
+    }
 };
 
 export const findByUserId = async (id: string) => {
@@ -28,7 +39,7 @@ export const findByUserId = async (id: string) => {
 
 export const findByFeature = async(feature: string) => {
     const result = await prisma.aICallLog.findMany({where:{featureName: feature}})
-    if (result === null){
+    if (result.length === 0){
         throw new Error ("No data exists for the given feature.")
     }
     return result;
