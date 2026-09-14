@@ -1,11 +1,13 @@
 // this file contains all logic which touches the DB using Prisma ORM
 
+
+
 import prisma from "../db/prisma.js";
 import type { NewUser, UserProfileUpdate, UpdatePassword } from "../types/api.types.js";
 
-export const createNewUser = async (user: NewUser) => {
+export const createNewUser = async (user: NewUser, client = prisma) => {
 
-    const result = await prisma.user.create({
+    const result = await client.user.create({
         data: {
             firstName: user.firstName,
             lastName: user.lastName,
@@ -23,25 +25,25 @@ export const createNewUser = async (user: NewUser) => {
 };
 
 
-export const findByEmail = async (userEmail: string) => {
+export const findByEmail = async (userEmail: string, client = prisma) => {
 
-    const result = await prisma.user.findUnique({ where: { email: userEmail } });
+    const result = await client.user.findUnique({ where: { email: userEmail } });
     if (!result) {
         return null
     }
     return result;
 };
 
-export const findById = async (userId: string) => {
-    const result = await prisma.user.findUnique({ where: { id: userId } });
+export const findById = async (userId: string, client = prisma) => {
+    const result = await client.user.findUnique({ where: { id: userId } });
     if (!result) {
         return null
     }
     return result
 };
 
-export const updateProfile = async(userData: UserProfileUpdate) =>{
-    const result = await prisma.user.update({
+export const updateProfile = async(userData: UserProfileUpdate, client = prisma) =>{
+    const result = await client.user.update({
         where: {
             id: userData.userId
         },
@@ -60,9 +62,9 @@ export const updateProfile = async(userData: UserProfileUpdate) =>{
     return result
 };
 
-export const updatePassword = async(passwordInfo:UpdatePassword) => {
+export const updatePassword = async(passwordInfo:UpdatePassword, client = prisma) => {
     const userId = passwordInfo.userId;
-    const result = await prisma.user.update({
+    const result = await client.user.update({
         where: {
             id: userId,
         },
