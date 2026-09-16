@@ -1,119 +1,173 @@
-import { aiConfig } from "../../config/aiConfig.js"
-import z from "zod"
+import { aiConfig } from "../../config/aiConfig.js";
+import { z } from "zod";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
-import prisma from "../../db/prisma.js";
 import { AIProvider as PrismaAIProvider } from "../../generated/prisma/enums.js";
 import { aiLog } from "../../repositories/aiCallLog.repository.js";
 
 type ModelTier = keyof typeof aiConfig;
 
+const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_CLAUDE_API_KEY });
 
-const openaiClient = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
-const anthropicClient = new Anthropic({apiKey: process.env.ANTHROPIC_CLAUDE_API_KEY});
-const MAX_TRIES = 3;
-const INITIAL_DELAY = 15000;
+const MAX_TRIES = 3;               // provider-level retry attempts (timeout/5xx/429)
+const INITIAL_BACKOFF_MS = 1000;   // 1s, then 2s — NOT the same as the request timeout
+const CORRECTIVE_RETRY_LIMIT = 1;  // schema-validation retries: ONE extra attempt only
 
-const userRequestMap = new Map();
+// Module-scope Map — created ONCE, shared across every aiClient call (persists via closure)
+const inFlightRequests = new Map<string, Promise<unknown>>();
 
-const aiClient = async (taskName: string, userId: number, prompt: string, options: {tier: ModelTier, schema: z.ZodType}) => {
-    const timerStart = Date.now();
-    let elapsedTime;
-    let aiResponse;
-    let fallbackStatus = false;
-    let success = true; 
-    let modelUsed = aiConfig[options.tier].models.openai;
-    let provider: PrismaAIProvider = PrismaAIProvider.OPENAI;
-    const modelTier: ModelTier = options.tier || "standard";
-   
-    
-    const requestKey = `${taskName}:${userId}`
-
-    const callOpenai = async(priorError: string = "") => {
-        const userPrompt = prompt + "   " + `Error from Previous Prompt: ${priorError}`
-        const response = await openaiClient.responses.create({
-                model: aiConfig[modelTier]["models"].openai,
-                input: userPrompt
-            })
-            return response.output_text
+export class AIValidationError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "AIValidationError";
     }
-
-    const callAnthropic = async(priorError: string = "") => {
-        const userPrompt = prompt + "   " + `Error from Previous Prompt: ${priorError}`
-        const response = await anthropicClient.messages.create({
-                model: aiConfig[modelTier]["models"].anthropic,
-                max_tokens: 1000,
-                messages: [{
-                    role: "user",
-                    content: userPrompt
-                }],
-            })
-            return response.content
-    }
-    
-    const retry = async <T>(fn: (err: string | undefined) => Promise<T>): Promise<T> => {
-            let currentDelay = INITIAL_DELAY;
-            let lastErrorMsg : string | undefined = "";
-            for (let attempt = 1; attempt <= MAX_TRIES; attempt++){
-                try{
-                    return await fn(lastErrorMsg);
-                }
-                catch(error){
-                    if (error instanceof Error){
-                        lastErrorMsg =  String(error.message);
-                    }
-                    
-                    if (attempt === MAX_TRIES) {
-                        throw error;
-                    }
-                    await new Promise(resolve => setTimeout(resolve, currentDelay));
-                    currentDelay += 1000;
-                    return await fn(lastErrorMsg);                
-                }
-            }
-            throw new Error("Retry limit exceeded");
-    }
-
-    const fallback = async () => {
-        fallbackStatus = false;
-        
-        try{
-            success = true;
-            aiResponse = await retry(callOpenai); 
-            return aiResponse
-        }
-        catch(error){
-            success = false;
-            fallbackStatus = true;
-            modelUsed = aiConfig[options.tier].models.anthropic
-            provider = PrismaAIProvider.ANTHROPIC;
-            return await retry(callAnthropic);
-            // throw error
-        }
-    }
-
-    try{
-        if (userRequestMap.has(requestKey)){
-            return fallback
-        }
-        else{
-            userRequestMap.set(requestKey, fallback())
-            const aiResult = await fallback();
-            userRequestMap.delete(requestKey)
-            return ({taskName, userId, aiResult})
-        }
-    } catch(error){
-        if (error instanceof Error){
-        console.error('Error: ', error.message)
-        throw error
-        }
-    }
-
-    elapsedTime = Date.now() - timerStart;
-    
-    aiLog(String(userId), taskName, provider, modelUsed, elapsedTime, success, fallbackStatus);
-
 }
 
+// Only retry transient failures — a 400/401 would just fail identically again
+const isRetryable = (error: unknown): boolean => {
+    if (error && typeof error === "object" && "status" in error) {
+        const status = (error as { status?: number }).status;
+        if (status === 429) return true;
+        if (status !== undefined && status >= 500) return true;
+        return false; // recognized, non-retryable status (e.g. 400/401)
+    }
+    return true; // unrecognized error shape (e.g. timeout) — assume retryable
+};
+
+const aiClient = async <T extends z.ZodType>(
+    taskName: string,
+    userId: string,
+    prompt: string,
+    options: { tier: ModelTier; schema: T }   // schema bound to T, not a bare z.ZodType
+): Promise<z.infer<T>> => {
+    const requestKey = `${taskName}:${userId}`;
+
+    // Idempotency: a call already in flight for this exact key returns the SAME promise
+    if (inFlightRequests.has(requestKey)) {
+        return inFlightRequests.get(requestKey) as Promise<z.infer<T>>;
+    }
+
+    const resultPromise = runAICall(taskName, userId, prompt, options);
+    inFlightRequests.set(requestKey, resultPromise);
+
+    try {
+        return await resultPromise;
+    } finally {
+        // Only cleaned up once THIS call actually settles — not before
+        inFlightRequests.delete(requestKey);
+    }
+};
+
+const runAICall = async <T extends z.ZodType>(
+    taskName: string,
+    userId: string,
+    prompt: string,
+    options: { tier: ModelTier; schema: T }
+): Promise<z.infer<T>> => {
+    const modelTier: ModelTier = options.tier || "standard";
+    const timerStart = Date.now();
+
+    let success = true;
+    let usedFallback = false;
+    let provider: PrismaAIProvider = PrismaAIProvider.OPENAI;
+    let modelUsed = aiConfig[modelTier].models.openai;
+
+    const callOpenai = async (priorError?: string): Promise<string> => {
+        const userPrompt = priorError
+            ? `${prompt}\n\nYour previous response had this error — please correct it: ${priorError}`
+            : prompt;
+        const response = await openaiClient.responses.create({
+            model: aiConfig[modelTier].models.openai,
+            input: userPrompt,
+        });
+        return response.output_text;
+    };
+
+    const callAnthropic = async (priorError?: string): Promise<string> => {
+        const userPrompt = priorError
+            ? `${prompt}\n\nYour previous response had this error — please correct it: ${priorError}`
+            : prompt;
+        const response = await anthropicClient.messages.create({
+            model: aiConfig[modelTier].models.anthropic,
+            max_tokens: 1000,
+            messages: [{ role: "user", content: userPrompt }],
+        });
+        // Anthropic returns an array of content blocks — normalize to a plain
+        // string so both providers hand back the SAME shape to the caller
+        const textBlock = response.content.find((block) => block.type === "text");
+        if (!textBlock || textBlock.type !== "text") {
+            throw new Error("Anthropic response contained no text block");
+        }
+        return textBlock.text;
+    };
+
+    // Retries the SAME provider fn on transient failures only (timeout/5xx/429)
+    const retryWithBackoff = async (
+        fn: (priorError?: string) => Promise<string>,
+        priorError?: string
+    ): Promise<string> => {
+        let currentDelay = INITIAL_BACKOFF_MS;
+        let lastErrorMsg = priorError;
+
+        for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+            try {
+                return await fn(lastErrorMsg);
+            } catch (error) {
+                lastErrorMsg = error instanceof Error ? error.message : String(error);
+
+                if (!isRetryable(error) || attempt === MAX_TRIES) {
+                    throw error;
+                }
+                await new Promise((resolve) => setTimeout(resolve, currentDelay));
+                currentDelay += 1000; // 1s → 2s
+                // loop continues naturally — no manual extra call here
+            }
+        }
+        throw new Error("Retry limit exceeded"); // unreachable, satisfies TS
+    };
+
+    // Parses + validates raw AI text against the schema. On failure, retries
+    // ONCE more with the validation error appended to the prompt (the
+    // "corrective retry" guardrail), then gives up entirely.
+    const callWithSchemaGuardrail = async (
+        fn: (priorError?: string) => Promise<string>
+    ): Promise<z.infer<T>> => {
+        let validationError: string | undefined;
+
+        for (let attempt = 0; attempt <= CORRECTIVE_RETRY_LIMIT; attempt++) {
+            const rawText = await retryWithBackoff(fn, validationError);
+
+            try {
+                const parsed = JSON.parse(rawText);
+                return options.schema.parse(parsed);
+            } catch (error) {
+                validationError = error instanceof Error ? error.message : String(error);
+            }
+        }
+
+        throw new AIValidationError(
+            `AI response failed schema validation after ${CORRECTIVE_RETRY_LIMIT + 1} attempt(s): ${validationError}`
+        );
+    };
+
+    try {
+        try {
+            return await callWithSchemaGuardrail(callOpenai);
+        } catch (error) {
+            usedFallback = true;
+            provider = PrismaAIProvider.ANTHROPIC;
+            modelUsed = aiConfig[modelTier].models.anthropic;
+            return await callWithSchemaGuardrail(callAnthropic);
+        }
+    } catch (error) {
+        success = false;
+        throw error;
+    } finally {
+        const elapsedMs = Date.now() - timerStart;
+        // Runs regardless of success/failure — awaited for reliability
+        await aiLog(userId, taskName, provider, modelUsed, elapsedMs, success, usedFallback);
+    }
+};
 
 export default aiClient;
