@@ -1,12 +1,13 @@
 
 import prisma from "../db/prisma.js";
 import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
+import type { Prisma, PrismaClient } from "../generated/prisma/client.js";
 
-export const createRoadmap = async (id: string,  
-    title: string, archivedAt: Date | null = null, 
-    createdAt: Date, updatedAt: Date) => {
+export const createRoadmap = async (id: string,
+    title: string, archivedAt: Date | null = null,
+    createdAt: Date, updatedAt: Date, client: PrismaClient | Prisma.TransactionClient = prisma) => {
     try{
-        const result = await prisma.roadmap.create({
+        const result = await client.roadmap.create({
         data: {
             userId: id,
             title: title,
@@ -20,11 +21,12 @@ export const createRoadmap = async (id: string,
     catch(error){
         if (error instanceof PrismaClientKnownRequestError){
             console.error("Error creating roadmap: ", error.message)
+            throw new Error(`unable to create roadmap: ${error.message}`)
         }
         else{
             throw new Error ("unable to create roadmap")
-        }   
-    }  
+        }
+    }
 }
 
 export const findActiveByUserId = async (id: string) => {

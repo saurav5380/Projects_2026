@@ -4,6 +4,7 @@
 
 import prisma from "../db/prisma.js";
 import type { NewUser, UserProfileUpdate, UpdatePassword } from "../types/api.types.js";
+import { Prisma, PrismaClient } from "../generated/prisma/client.js";
 
 export const createNewUser = async (user: NewUser, client = prisma) => {
 
@@ -42,18 +43,19 @@ export const findById = async (userId: string, client = prisma) => {
     return result
 };
 
-export const updateProfile = async(userData: UserProfileUpdate, client = prisma) =>{
+export const updateProfile = async(userId: string, userData: UserProfileUpdate, client: PrismaClient | Prisma.TransactionClient = prisma) =>{
     const result = await client.user.update({
         where: {
-            id: userData.userId
+            id: userId
         },
-        data:{
-            firstName: userData.firstName,
-            lastName: userData.lastName,
-            currentRole: userData.currentRole,
-            targetRole: userData.targetRole,
-            weeklyHours: userData.weeklyHours,
-            targetMonths: userData.targetMonths
+        data: {
+            ...(userData.firstName !== undefined && { firstName: userData.firstName }),
+            ...(userData.lastName !== undefined && { lastName: userData.lastName }),
+            ...(userData.currentRole !== undefined && { currentRole: userData.currentRole }),
+            ...(userData.targetRole !== undefined && { targetRole: userData.targetRole }),
+            ...(userData.weeklyHours !== undefined && { weeklyHours: userData.weeklyHours }),
+            ...(userData.targetMonths !== undefined && { targetMonths: userData.targetMonths }),
+            ...(userData.onboardingDone !== undefined && { onboardingDone: userData.onboardingDone })
         }
     });
     if (!result){

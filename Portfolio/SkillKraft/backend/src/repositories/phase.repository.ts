@@ -1,10 +1,11 @@
 
 import prisma from "../db/prisma.js";
 import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
+import type { Prisma, PrismaClient } from "../generated/prisma/client.js";
 
-export const createPhases = async (id: string, phaseTitle: string, sequence: number, updateAt: Date) => {
+export const createPhases = async (id: string, phaseTitle: string, sequence: number, updateAt: Date, client: PrismaClient | Prisma.TransactionClient = prisma) => {
     try{
-        const result = await prisma.roadmapPhase.createMany({
+        const result = await client.roadmapPhase.create({
             data: {
                 roadmapId: id,
                 title: phaseTitle,
@@ -18,6 +19,7 @@ export const createPhases = async (id: string, phaseTitle: string, sequence: num
             console.error(`Error: ${error.message}`)
             throw new Error(`Could not generate roadmpa phases: ${error.message}`)
         }
+        throw error;
     }
 }
 

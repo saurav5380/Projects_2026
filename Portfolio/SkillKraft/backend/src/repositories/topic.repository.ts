@@ -2,16 +2,18 @@
 
 import prisma from "../db/prisma.js";
 import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
+import type { Prisma, PrismaClient } from "../generated/prisma/client.js";
 
-export const createTopics = async (phaseId: string, 
-    title: string, 
-    description: string, 
-    estimatedHours:number, 
-    isCheckpoint:boolean = false, 
+export const createTopics = async (phaseId: string,
+    title: string,
+    description: string,
+    estimatedHours:number,
+    isCheckpoint:boolean = false,
     order: number,
     createdAt: Date,
-    updatedAt: Date) => {
-    const result = await prisma.topic.createMany({
+    updatedAt: Date,
+    client: PrismaClient | Prisma.TransactionClient = prisma) => {
+    const result = await client.topic.create({
         data: {
             phaseId,
             title,
@@ -23,9 +25,6 @@ export const createTopics = async (phaseId: string,
             updatedAt
         }
     });
-    if (result.count === 0){
-        throw new Error(`Could not create topics.`)
-    }
     return result;
 }
 
