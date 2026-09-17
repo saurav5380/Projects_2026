@@ -14,7 +14,7 @@ const MAX_TRIES = 3;               // provider-level retry attempts (timeout/5xx
 const INITIAL_BACKOFF_MS = 1000;   // 1s, then 2s — NOT the same as the request timeout
 const CORRECTIVE_RETRY_LIMIT = 1;  // schema-validation retries: ONE extra attempt only
 
-// Module-scope Map — created ONCE, shared across every aiClient call (persists via closure)
+// Module-scope Map — created ONCE, shared across every aiClient call 
 const inFlightRequests = new Map<string, Promise<unknown>>();
 
 export class AIValidationError extends Error {
@@ -30,16 +30,16 @@ const isRetryable = (error: unknown): boolean => {
         const status = (error as { status?: number }).status;
         if (status === 429) return true;
         if (status !== undefined && status >= 500) return true;
-        return false; // recognized, non-retryable status (e.g. 400/401)
+        return false; 
     }
-    return true; // unrecognized error shape (e.g. timeout) — assume retryable
+    return true; 
 };
 
 const aiClient = async <T extends z.ZodType>(
     taskName: string,
     userId: string,
     prompt: string,
-    options: { tier: ModelTier; schema: T }   // schema bound to T, not a bare z.ZodType
+    options: { tier: ModelTier; schema: T }  
 ): Promise<z.infer<T>> => {
     const requestKey = `${taskName}:${userId}`;
 
@@ -54,7 +54,6 @@ const aiClient = async <T extends z.ZodType>(
     try {
         return await resultPromise;
     } finally {
-        // Only cleaned up once THIS call actually settles — not before
         inFlightRequests.delete(requestKey);
     }
 };
