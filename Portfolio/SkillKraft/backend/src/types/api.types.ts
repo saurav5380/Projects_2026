@@ -7,13 +7,13 @@ export type NewUser = {
 }
 
 export type UserProfileUpdate = {
-    userId: string,
-    firstName: string,
-    lastName: string,
-    currentRole: string,
-    targetRole: string,
-    weeklyHours: number,
-    targetMonths: number
+    firstName?: string,
+    lastName?: string,
+    currentRole?: string,
+    targetRole?: string,
+    weeklyHours?: number,
+    targetMonths?: number,
+    onboardingDone?: boolean
 }
 
 export type UpdatePassword = {

@@ -13,8 +13,8 @@ export const getProfile = async(userId: string) => {
     return user;
 }
 
-export const updateUserProfile = async(userData: UserProfileUpdate) => {
-    const result = await updateProfile(userData)
+export const updateUserProfile = async(userId: string, userData: UserProfileUpdate) => {
+    const result = await updateProfile(userId, userData)
     if (!result){
         throw new Error ('Profile Update failed')
     }

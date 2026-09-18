@@ -17,7 +17,7 @@ export const createPhases = async (id: string, phaseTitle: string, sequence: num
     catch(error){
         if (error instanceof PrismaClientKnownRequestError){
             console.error(`Error: ${error.message}`)
-            throw new Error(`Could not generate roadmpa phases: ${error.message}`)
+            throw new Error(`Could not generate roadmap phases: ${error.message}`)
         }
         throw error;
     }

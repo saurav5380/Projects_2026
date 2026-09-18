@@ -7,7 +7,7 @@ import { UpdateProfileBody, ChangePassword } from '../validators/user.validators
 export const getProfileController = async (req: Request, res: Response, next: NextFunction) => {
     try{
         const userId = req.user?.id as string;
-        console.log("User Id: ", userId)
+        // console.log("User Id: ", userId)
         const userProfile = await getProfile(userId)
         if (!userProfile){
             res.status(500).json({
@@ -43,7 +43,7 @@ export const updateProfileController = async (req: Request, res: Response, next:
         }
         const {firstName, lastName, currentRole, targetRole, weeklyHours, targetMonths} = result.data;
         const updateData = {userId,firstName, lastName, currentRole, targetRole, weeklyHours, targetMonths };
-        const updatedProfile = await updateUserProfile(updateData);
+        const updatedProfile = await updateUserProfile(userId, updateData);
         
         res.status(201).json({
             message: "User profile updated",

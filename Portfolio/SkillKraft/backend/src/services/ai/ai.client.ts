@@ -11,8 +11,8 @@ const openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_CLAUDE_API_KEY });
 
 const MAX_TRIES = 3;               // provider-level retry attempts (timeout/5xx/429)
-const INITIAL_BACKOFF_MS = 1000;   // 1s, then 2s — NOT the same as the request timeout
-const CORRECTIVE_RETRY_LIMIT = 1;  // schema-validation retries: ONE extra attempt only
+const INITIAL_BACKOFF_MS = 1000;   // 1s, then 2s — not the same as the request timeout
+const CORRECTIVE_RETRY_LIMIT = 1;  // schema-validation retries: one extra attempt
 
 // Module-scope Map — created ONCE, shared across every aiClient call 
 const inFlightRequests = new Map<string, Promise<unknown>>();
@@ -120,10 +120,10 @@ const runAICall = async <T extends z.ZodType>(
                 }
                 await new Promise((resolve) => setTimeout(resolve, currentDelay));
                 currentDelay += 1000; // 1s → 2s
-                // loop continues naturally — no manual extra call here
+               
             }
         }
-        throw new Error("Retry limit exceeded"); // unreachable, satisfies TS
+        throw new Error("Retry limit exceeded"); 
     };
 
     // Parses + validates raw AI text against the schema. On failure, retries
