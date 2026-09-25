@@ -2,7 +2,7 @@
 
 import prisma from "../db/prisma.js";
 import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
-import type { Prisma, PrismaClient } from "../generated/prisma/client.js";
+import { PrismaClient, Prisma } from "../generated/prisma/client.js";
 
 export const createTopics = async (phaseId: string,
     title: string,
@@ -39,7 +39,7 @@ export const findTopic = async (topicId: string) => {
 }
 
 export const findByPhaseId = async (id: string) => {
-    const result = await prisma.topic.findFirst({
+    const result = await prisma.topic.findMany({
         where: {phaseId: id}
     })
     if (result === null){
@@ -48,9 +48,9 @@ export const findByPhaseId = async (id: string) => {
     return result;
 }
 
-export const updateOrder = async (id: string, revisedOrder: number) => {
+export const updateOrder = async (id: string, revisedOrder: number, client : PrismaClient | Prisma.TransactionClient = prisma) => {
     try{
-        const result = await prisma.topic.update({
+        const result = await client.topic.update({
             where: {
                 id: id
             },
