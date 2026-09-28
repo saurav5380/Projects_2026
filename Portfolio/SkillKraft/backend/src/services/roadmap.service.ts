@@ -8,10 +8,6 @@
 */
 
 import { findActiveRoadmapDetails, isBookmarkedByUser } from "../repositories/roadmap.repository.js";
-// import { findByRoadmapId } from "../repositories/phase.repository.js";
-// import { findByPhaseId } from "../repositories/topic.repository.js";
-// import { findByTopicId } from "../repositories/resource.repository.js";
-
 
 export const getActiveRoadmap = async (userId: string) => {
     try{
@@ -24,10 +20,40 @@ export const getActiveRoadmap = async (userId: string) => {
 
         const roadmapWithComputedFields = {
             ...activeRoadmapWithDetails,
-            phases: 
+            phases: activeRoadmapWithDetails.phases.map((phase) => {
+                const topicsWithComputedData = phase.topics.map((topic) => ({
+                    ...topic,
+                    resources: topic.resources.map((resource) => ({
+                        ...resource,
+                        isBookmarkedByUser: bookmarkedResourceIds.has(resource.id)
+                    }))
+                }))
+                const phaseCompletedCount = topicsWithComputedData.filter((topic) => topic.userProgress[0]?.status === "COMPLETE").length;
+
+                return {
+                    ...phase,
+                    topicsWithComputedData,
+                    phaseProgressPercent: Math.round((phaseCompletedCount/topicsWithComputedData.length) * 100)
+                }
+            }),
         }
+
+        const allTopics = activeRoadmapWithDetails.phases.flatMap((phase) => phase.topics);
+
+        const completedCount = allTopics.filter(
+            (topic) => topic.userProgress[0]?.status === "COMPLETE"
+        ).length;
+
+        const totalCount = allTopics.length;
+
+        const progressPercent = totalCount > 0
+            ? Math.round((completedCount / totalCount) * 100)
+            : 0;
         
-    return;
+    return {
+        ...roadmapWithComputedFields,
+        progressPercent
+    };
     }
     catch(error){
          console.error("Error fetching roadmap details:", error instanceof Error ? error.message : error);
