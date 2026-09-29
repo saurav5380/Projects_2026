@@ -32,9 +32,9 @@ export const findTopic = async (topicId: string) => {
     const result = await prisma.topic.findFirst({
         where: {id: topicId}
     })
-    if (result === null){
-        throw new Error(`Could not find the requested topic.`)
-    }
+    // if (result === null){
+    //     throw new Error(`Could not find the requested topic.`)
+    // }
     return result;
 }
 
@@ -42,14 +42,13 @@ export const findByPhaseId = async (id: string) => {
     const result = await prisma.topic.findMany({
         where: {phaseId: id}
     })
-    if (result === null){
-        throw new Error(`Phase with id : ${id} does not exist`)
-    }
+    // if (result === null){
+    //     throw new Error(`Phase with id : ${id} does not exist`)
+    // }
     return result;
 }
 
 export const updateOrder = async (id: string, revisedOrder: number, client : PrismaClient | Prisma.TransactionClient = prisma) => {
-    try{
         const result = await client.topic.update({
             where: {
                 id: id
@@ -60,11 +59,4 @@ export const updateOrder = async (id: string, revisedOrder: number, client : Pri
     })
     return result;
     }
-    catch(error){
-        if (error instanceof PrismaClientKnownRequestError){
-            console.error(`Error: ${error.message}`)
-            return (`Could not update order. Error: ${error.message}`)
-        }
-    }
-}
 

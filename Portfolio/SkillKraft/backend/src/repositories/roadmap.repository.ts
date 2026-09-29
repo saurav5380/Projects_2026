@@ -41,14 +41,46 @@ export const archiveById = async (id: string, archivalDate: Date) => {
 
 export const rename = async (id: string, newTitle: string) => {
         const result = await prisma.roadmap.update({
-        where: {
-            id: id
-        },
-        data: {
-            title: newTitle
-        }
-    })
+            where: {
+                id: id,
+            },
+            data: {
+                title: newTitle
+            }
+        })
     return result
     }
 
 
+export const findActiveRoadmapDetails = async (id: string, client: PrismaClient | Prisma.TransactionClient = prisma) => {
+    const result = await client.roadmap.findFirst({
+        where: {
+            userId: id,
+            archivedAt: null
+        },
+        include: {
+            phases: {
+                orderBy: { order: "asc" },
+                include: {
+                    topics: {
+                        orderBy: { order: "asc" },
+                        include: {
+                            resources: true,
+                            userProgress: { where: {userId: id} }
+                        },
+                    }
+                },
+            }
+        },
+    })
+    return result;
+};
+
+export const isBookmarkedByUser = async (id: string, client :  PrismaClient | Prisma.TransactionClient = prisma ) => {
+    const result = await client.userResourceBookmark.findMany({ 
+        where: {
+            userId: id
+        }
+    })
+    return result;
+}

@@ -28,19 +28,15 @@ export const createResources = async (topicId: string, title: string, url: strin
 }
 
 export const findByTopicId = async (id: string) => {
-    const result = await prisma.resource.findFirst({
+    const result = await prisma.resource.findMany({
         where: {
             topicId: id
         }
     })
-    if (result === null) {
-        return (`No topic found. Check the topic ID: ${id}`)
-    }
     return result;
 }
 
 export const createOne = async (userId: string, topicId: string, title: string, url: string, resourceType: ResourceType) => {
-    try {
         const result = await prisma.resource.create({
             data: {
                 topicId,
@@ -56,23 +52,8 @@ export const createOne = async (userId: string, topicId: string, title: string, 
         })
         return result;
     }
-    catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
-            console.error(`Error: ${error.message}`)
-            return {
-                "error": error.name,
-                "details": error.message,
-                "code": error.code
-            }
-        }
-        else if (error instanceof Error) {
-            return (`Error: ${error.message}`)
-        }
-    }
-}
 
 export const deleteById = async (resourceId: string) => {
-    try {
         const result = await prisma.resource.delete({
             where: {
                 id: resourceId
@@ -80,23 +61,9 @@ export const deleteById = async (resourceId: string) => {
         })
         return result;
     }
-    catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
-            console.error(`Error: ${error.message}`)
-            return {
-                "error": error.name,
-                "details": error.message,
-                "code": error.code
-            }
-        }
-        else if (error instanceof Error) {
-            return (`Error: ${error.message}`)
-        }
-    }
-}
+    
 
 export const updateVerificationStatus = async (resourceId: string, isValidated: VerificationStatus) => {
-    try {
         const result = await prisma.resource.update({
             where: {
                 id: resourceId
@@ -107,23 +74,9 @@ export const updateVerificationStatus = async (resourceId: string, isValidated: 
         })
         return result;
     }
-    catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
-            console.error(`Error: ${error.message}`)
-            return {
-                "error": error.name,
-                "details": error.message,
-                "code": error.code
-            }
-        }
-        else if (error instanceof Error) {
-            return (`Error: ${error.message}`)
-        }
-    }
-}
+    
 
 export const setFlaggedForRevalidation = async (resourceId: string, revalidationFlag: boolean) => {
-    try {
         const result = await prisma.resource.update({
             where: {
                 id: resourceId
@@ -134,23 +87,8 @@ export const setFlaggedForRevalidation = async (resourceId: string, revalidation
         })
         return result;
     }
-    catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
-            console.error(`Error: ${error.message}`)
-            return {
-                "error": error.name,
-                "details": error.message,
-                "code": error.code
-            }
-        }
-        else if (error instanceof Error) {
-            return (`Error: ${error.message}`)
-        }
-    }
-}
-
+    
 export const findFlaggedForRevalidation = async (): Promise<Resource[] | { error: string; details: string; code: string } | string | undefined> => {
-    try {
         const result = await prisma.resource.findMany({
             where: {
                 flaggedForRevalidation: true
@@ -158,17 +96,4 @@ export const findFlaggedForRevalidation = async (): Promise<Resource[] | { error
         })
         return result;
     }
-    catch (error) {
-        if (error instanceof PrismaClientKnownRequestError) {
-            console.error(`Error: ${error.message}`)
-            return {
-                "error": error.name,
-                "details": error.message,
-                "code": error.code
-            }
-        }
-        else if (error instanceof Error) {
-            return (`Error: ${error.message}`)
-        }
-    }
-}
+    

@@ -15,7 +15,7 @@ export const createPhases = async (id: string, phaseTitle: string, sequence: num
 }
 
 export const findByRoadmapId = async (id: string) => {
-        const result = await prisma.roadmapPhase.findFirst({
+        const result = await prisma.roadmapPhase.findMany({
           where: {
             roadmapId:id 
             }})
