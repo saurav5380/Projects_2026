@@ -9,7 +9,7 @@ import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { cn } from '@/lib/utils'; // In-built ShadCN helper — merges Tailwind classes safely
+import { cn } from '@/lib/utils'; 
 import Image from 'next/image';
 
 const registerSchema = z.object({

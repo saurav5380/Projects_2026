@@ -4,8 +4,6 @@ import apiRequest from "@/lib/apiClient";
 import { useRouter } from 'next/navigation';
 import * as authHelpers from "@/lib/auth"
 
-// import { refresh } from "next/cache";
-
 export const useAuth = () => {
     const router = useRouter();
 
@@ -83,7 +81,7 @@ export const useAuth = () => {
         logoutError: logoutMutation.error,
         LogoutIsPending: logoutMutation.isPending,
 
-        currentUser,
+        useCurrentUser: currentUser,
         currentUserError,
         currentUserDataIsPending
     }
