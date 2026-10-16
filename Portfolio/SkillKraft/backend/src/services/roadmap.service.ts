@@ -93,3 +93,13 @@ export const regenerateRoadmap = async (userId: string, body: Body) => {
 
     return newRoadmap;
 }
+
+export const presentRoadmap = async (userId: string) => {
+    const result = await findActiveByUserId(userId);
+    if (!result){
+        throw new Error ("No active roadmap found for user")
+    }
+
+    return result
+}
+

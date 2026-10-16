@@ -21,7 +21,7 @@ export const updateTopicOrderController = async (req: Request, res: Response, ne
         }
         const phaseId = req.params.phaseId as string;
         const revisedTopicOrder = topicOrder.data?.topicIds || [];
-        const result = await reorderTopics(userId, phaseId, revisedTopicOrder)
+        const result = await reorderTopics(userId, phaseId, revisedTopicOrder);
         return res.status(204).json({
             success: true
         })

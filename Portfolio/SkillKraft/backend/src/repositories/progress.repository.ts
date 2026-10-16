@@ -15,7 +15,7 @@ export const findByUserAndTopic = async(id: string, topicId: string) => {
         return result;
 };
 
-export const upsertTopicProgress = async(userId: string, topicId: string, topicStatus: TopicStatus) => {
+export const updateProgress = async(userId: string, topicId: string, topicStatus: TopicStatus) => {
     const result = await prisma.userTopicProgress.upsert({
         where: {
             userId_topicId: {

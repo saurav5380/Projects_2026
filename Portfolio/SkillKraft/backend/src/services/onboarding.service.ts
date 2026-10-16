@@ -10,15 +10,8 @@ import { searchAndValidate } from "./resourceValidator.service.js"
 import prisma from "../db/prisma.js"
 import type { Prisma } from "../generated/prisma/client.js"
 import { ResourceType, ResourceSource, VerificationStatus } from "../generated/prisma/enums.js"
+import type { Body } from "../types/ai.types.js"
 
-enum tgtMonths {three = 3,six = 6,twelve = 12}
-
-type Body = {
-    "currentRole" : string,
-    "targetRole" : string,
-    "weeklyHours" : number,
-    "targetMonths" : tgtMonths
-}
 
 const RESOURCE_TYPES = new Set(["ARTICLE", "COURSE", "DOCUMENTATION", "VIDEO"]);
 

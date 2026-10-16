@@ -1,7 +1,6 @@
 // `createMany`, `findById`, `findByPhaseId`, `updateOrder`
 
 import prisma from "../db/prisma.js";
-import { PrismaClientKnownRequestError } from "../generated/prisma/internal/prismaNamespace.js";
 import { PrismaClient, Prisma } from "../generated/prisma/client.js";
 
 export const createTopics = async (phaseId: string,
@@ -28,13 +27,11 @@ export const createTopics = async (phaseId: string,
     return result;
 }
 
-export const findTopic = async (topicId: string) => {
+export const findByTopic = async (topicId: string) => {
     const result = await prisma.topic.findFirst({
         where: {id: topicId}
     })
-    // if (result === null){
-    //     throw new Error(`Could not find the requested topic.`)
-    // }
+    
     return result;
 }
 
@@ -42,9 +39,7 @@ export const findByPhaseId = async (id: string) => {
     const result = await prisma.topic.findMany({
         where: {phaseId: id}
     })
-    // if (result === null){
-    //     throw new Error(`Phase with id : ${id} does not exist`)
-    // }
+    
     return result;
 }
 

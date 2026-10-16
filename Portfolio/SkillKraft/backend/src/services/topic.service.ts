@@ -1,6 +1,6 @@
 // backend service used to reorder topics in a phase - user can drag and drop topics in a phase and re-order them.
 
-import { findByPhaseId, updateOrder } from "../repositories/topic.repository.js";
+import { findByPhaseId, updateOrder, findByTopic } from "../repositories/topic.repository.js";
 import type { Prisma } from "../generated/prisma/client.js"
 import prisma from "../db/prisma.js";
 
@@ -26,4 +26,8 @@ export const reorderTopics = async (userId: string, phaseId: string, topicId: st
     })
 
     return reorderedTopics;
+}
+
+export const getTopic = async (id: string) => {
+    const result = await findByTopic(id);
 }

@@ -34,7 +34,7 @@ const searchTopResult = async(searchQuery: String): Promise<{url: string; title:
 
     const data: SerperResponse = await response.json();
     const topResult = data.organic?.[0];
-
+    
     if (!topResult){
         return null
     }
