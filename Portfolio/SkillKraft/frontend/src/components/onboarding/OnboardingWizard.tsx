@@ -15,7 +15,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import apiRequest from "@/lib/apiClient";
 import { Spinner } from "../ui/spinner";
-
+import { toast } from "sonner";
+import { AxiosError, isAxiosError } from "axios";
+import type { ApiSuccess, OnboardingResult } from "../../app/types/api.types";
 
 export const OnboardingWizard = () => {
     const {handleSubmit, trigger, control} = useForm<Onboarding>({
@@ -29,21 +31,25 @@ export const OnboardingWizard = () => {
 
     const onboardingMutation = useMutation({
         mutationFn: async (onboardingData: Onboarding) => {
-            const response = await apiRequest.post<Onboarding>("/onboarding", onboardingData)
+            const response = await apiRequest.post<ApiSuccess<OnboardingResult>>("/onboarding", onboardingData)
             return response
         },
-        onSuccess: (data) => {
-            queryClient.invalidateQueries({ queryKey: ['user', 'me']})
+        onSuccess: async (data) => {
+            await queryClient.invalidateQueries({ queryKey: ['user', 'me']})
             router.push("/dashboard")
             console.log(data)
         },
-        onError: (error) => {
-            console.error("Onboarding failed", error.message)
-        }
+        onError: (error: AxiosError<{ error?: { message?: string } }>) => {
+            if (error.response?.status === 409){
+                router.push("/dashboard")
+            }
+            if (isAxiosError(error)){
+            console.error("Onboarding failed", error.response?.data?.error?.message ?? error.message)
+            toast.error(`Onboarding failed: ${error.message}`)
+        }}
 })
     const [counter, setCounter] = useState(0);
 
-    // const steps = [StepCurrentRole,StepTargetRole, StepWeeklyHours, StepTimeline];
 
     const Step: (keyof Onboarding)[] = ["currentRole", "targetRole","weeklyHours", "targetMonths"];
 
@@ -62,11 +68,18 @@ export const OnboardingWizard = () => {
 
     // submit to POST /onboarding
     const formSubmit = (data: Onboarding) => {
-        if (counter === 3){
-            onboardingMutation.mutate(data)
-            console.log(data)
-        }
+        onboardingMutation.mutate(data)
+        // console.log(data)
+    }
 
+    const handleFormSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (counter < LAST_STEP){
+            handleNext()
+            return
+        }
+        handleSubmit(formSubmit)(e)
     }
 
     if (onboardingMutation.isPending){
@@ -81,7 +94,7 @@ export const OnboardingWizard = () => {
 
     return (
         <>
-        <form onSubmit={handleSubmit(formSubmit)}>
+        <form onSubmit={handleFormSubmit}>
             <Card>
                 {counter === 0 && <StepCurrentRole ctrl={control} />}
                 {counter === 1 && <StepTargetRole ctrl={control}/>}
